@@ -606,6 +606,7 @@ class CourseSeeder extends Seeder
                             'title'   => $lessonData['title'],
                             'content' => $this->cleanText($lessonData['content']),
                             'order'   => $lessonData['order'],
+                            'score_requirement' => 70, // mặc định 70 điểm để qua bài
                         ]);
                     }
                 }
