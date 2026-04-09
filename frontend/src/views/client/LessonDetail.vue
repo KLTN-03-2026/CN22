@@ -1,6 +1,6 @@
 <template>
     <div class="min-h-screen bg-gray-50">
-        <div class="max-w-10xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
             <!-- Back Button -->
             <button @click="goBack" class="mb-4 text-indigo-600 hover:underline text-sm">
@@ -28,7 +28,7 @@
             </div>
 
             <!-- Layout -->
-            <div v-else :class="['grid gap-6', isSidebarOpen ? 'lg:grid-cols-12' : 'lg:grid-cols-9']">
+            <div v-else class="grid gap-6 lg:grid-cols-12">
 
                 <!-- LEFT SIDEBAR -->
                 <div v-if="isSidebarOpen"
@@ -55,62 +55,54 @@
                     </div>
                 </div>
 
-                <!-- MAIN CONTENT -->
-                <div :class="isSidebarOpen ? 'lg:col-span-5' : 'lg:col-span-5'">
-                    <button v-if="!isSidebarOpen" @click="isSidebarOpen = true" class="mb-2 text-sm text-indigo-600">
-                        ☰ Mở nội dung
+                <!-- MAIN CONTENT + BÀI TẬP (đặt chung 1 cột) -->
+                <div :class="isSidebarOpen ? 'lg:col-span-9' : 'lg:col-span-12'">
+
+                    <!-- Nút mở sidebar khi bị đóng -->
+                    <button v-if="!isSidebarOpen" @click="isSidebarOpen = true"
+                        class="mb-4 text-sm text-indigo-600 flex items-center gap-2">
+                        ☰ Mở nội dung khóa học
                     </button>
 
+                    <!-- Video / Main Content -->
+                    <div class="bg-white rounded-xl shadow overflow-hidden mb-6">
+                        <iframe class="w-full h-[300px] md:h-[450px] lg:h-[500px]"
+                            src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
+                    </div>
+
+                    <!-- Nội dung bài học -->
                     <div class="bg-white rounded-xl shadow p-6">
-                        <h1 class="text-2xl font-bold text-gray-800 mb-4">{{ lesson.title }}</h1>
-
-                        <div class="bg-gray-100 rounded-full h-3 overflow-hidden">
-                            <div class="bg-indigo-600 h-3" :style="{ width: lesson.progress.percentage + '%' }"></div>
-                        </div>
-                        <p class="text-xs text-gray-500 mt-1">Tiến độ: {{ lesson.progress.percentage }}%</p>
-                    </div>
-
-                    <div class="bg-white rounded-xl shadow overflow-hidden">
-                        <!-- note -->
-                        <iframe class="w-full h-64 md:h-96" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0"
-                            allowfullscreen></iframe>
-                    </div>
-
-                    <div class="bg-white rounded-xl shadow p-6 prose max-w-none">
+                        <h1 class="text-2xl font-bold text-gray-800 mb-4">
+                            {{ lesson.order }}{{ lesson.title }}
+                        </h1>
                         <div v-html="lesson.content"></div>
                     </div>
 
-                </div>
+                    <!-- ==================== BÀI TẬP - ĐẶT DƯỚI MAIN CONTENT ==================== -->
+                    <div class="mt-8">
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Bài tập</h3>
 
-                <!-- RIGHT SIDEBAR -->
-                <div :class="isSidebarOpen ? 'lg:col-span-4' : 'lg:col-span-4'">
-                    <p v-if="!isSidebarOpen" class="p-4"></p>
-                    <div class="bg-white rounded-xl shadow p-4 sticky top-6 space-y-4">
+                            <!-- QUIZ COMPONENT -->
+                            <ExerciseQuiz @submitted="handleQuizResult" />
 
-                        <h3 class="text-lg font-semibold text-gray-800">Bài tập</h3>
+                            <!-- CODE COMPONENT -->
+                            <!-- <ExerciseCode v-if="lesson.exercise?.type === 'code'" @submitted="handleCodeResult" /> -->
 
-                        <!-- QUIZ COMPONENT -->
-                         <!-- v-if="lesson.exercise?.type === 'quiz'" note v-if="lesson.exercise?.type === 'quiz'" -->
-                        <ExerciseQuiz  
-                            @submitted="handleQuizResult" />
-
-                        <!-- CODE COMPONENT -->
-                         <!-- note -->
-                        <!-- <ExerciseCode v-if="lesson.exercise.type === 'code'" @submitted="handleCodeResult" /> -->
-
-                        <!-- RESULT SUMMARY -->
-                        <div v-if="exerciseResult" class="text-sm mt-2">
-                            <p>Kết quả: {{ exerciseResult.score }}%</p>
-                            <p :class="exerciseResult.passed ? 'text-green-600' : 'text-red-600'">
-                                {{ exerciseResult.passed ? 'Đạt' : 'Chưa đạt' }}
-                            </p>
+                            <!-- Kết quả -->
+                            <div v-if="exerciseResult" class="mt-6 p-4 bg-gray-50 rounded-lg text-sm">
+                                <p class="font-medium">Kết quả: <span class="font-bold">{{ exerciseResult.score
+                                        }}%</span></p>
+                                <p :class="exerciseResult.passed ? 'text-green-600' : 'text-red-600'">
+                                    {{ exerciseResult.passed ? '✅ Đạt yêu cầu' : '❌ Chưa đạt' }}
+                                </p>
+                            </div>
                         </div>
-
                     </div>
+
                 </div>
 
             </div>
-
         </div>
     </div>
 </template>
@@ -173,7 +165,7 @@ const fetchLessonFromAPI = () => {
 }
 
 const loadLesson = async () => {
-    // isLoading.value = true
+    isLoading.value = true
     error.value = null
 
     try {

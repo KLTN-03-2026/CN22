@@ -35,22 +35,14 @@
             <!-- Course List -->
             <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div v-for="course in filteredCourses" :key="course.id"
-                    class="bg-white rounded-xl shadow hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                    class="bg-white rounded-xl shadow hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden" @click="navigateToDetail(course.slug)">
                     <!-- Thumbnail -->
                     <div class="relative">
                         <img :src="course.thumbnail" alt="course image" class="w-full h-40 object-cover" />
-
-                        <!-- Play Button -->
-                        <button @click="navigateToDetail(course.slug)"
-                            class="absolute inset-0 flex items-center justify-center">
-                            <div class="bg-indigo-600 text-white p-3 rounded-full hover:bg-indigo-700 transition">
-                                ▶
-                            </div>
-                        </button>
                     </div>
 
                     <!-- Content -->
-                    <div class="p-4">
+                    <div class="p-4 relative">
                         <h2 class="text-lg font-semibold text-gray-800 mb-2 line-clamp-1">
                             {{ course.title }}
                         </h2>
@@ -62,7 +54,7 @@
                         <!-- Price + Status -->
                         <div class="flex items-center justify-between">
                             <span class="text-indigo-600 font-bold">
-                                {{ formatPrice(course.price) }}
+                                {{ formatCurrency(course.price) }}
                             </span>
 
                             <span :class="course.is_enrolled
@@ -72,11 +64,30 @@
                             </span>
                         </div>
 
-                        <!-- Action -->
-                        <button @click="navigateToDetail(course.slug)"
-                            class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition">
-                            Xem chi tiết
-                        </button>
+                        <!-- Progress Bar -->
+                        <div class="mt-6">
+                            <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                <span>Progress</span>
+                            </div>
+                            <div class="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+                                <div class="h-full bg-linear-to-r from-indigo-500 to-cyan-400 transition-all duration-500"
+                                    :style="{ width: `${50}%` }"></div>
+                            </div>
+                        </div>
+
+                        <!-- Play Button -->
+                        <div class="absolute bottom-4 right-4">
+                            <button @click="navigateToDetail(course.slug)"
+                                class="flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-l from-sky-500 to-indigo-500 text-white shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -119,13 +130,12 @@ const filteredCourses = computed(() => {
 })
 
 const navigateToDetail = (slug) => {
-    console.log(`/courses/${slug}`);
     router.push(`/courses/${slug}`)
 }
 
-const formatPrice = (price) => {
+const formatCurrency = (price) => {
     if (!price) return 'Miễn phí'
-    return `$${price}`
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
 }
 
 onMounted(() => {

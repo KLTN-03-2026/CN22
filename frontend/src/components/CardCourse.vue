@@ -110,10 +110,12 @@ const emit = defineEmits(['card-click', 'play-click']);
 
 // Methods
 const handleCardClick = () => {
-    emit('card-click', {
-        courseId: props.courseId,
-        title: props.title
-    });
+
+    alert(`Card clicked: ${props.title} (ID: ${props.courseId})`);
+    // emit('card-click', {
+    //     courseId: props.courseId,
+    //     title: props.title
+    // });
 
     // For future router integration (commented out for now)
     // router.push(`/courses/${props.courseId}`);

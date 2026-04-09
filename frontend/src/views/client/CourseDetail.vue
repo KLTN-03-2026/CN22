@@ -18,10 +18,10 @@
                         <p class="text-gray-600 mb-4">
                             {{ course.description }}
                         </p>
-
                         <div>
-                            <div class="bg-gray-100 rounded-full h-3 overflow-hidden">
-                                <div class="bg-indigo-600 h-3" :style="{ width: course.progress + '%' }"></div>
+                            <div class="h-3 w-full overflow-hidden rounded-full bg-gray-200">
+                                <div class="h-full bg-linear-to-r from-indigo-500 to-cyan-500 transition-all duration-500"
+                                    :style="{ width: `${course.progress}%` }"></div>
                             </div>
                             <p class="text-xs text-gray-500 mt-1">Hoàn thành: {{ course.progress }}</p>
                         </div>
@@ -68,14 +68,14 @@
                                 class="p-6 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition">
                                 <div>
                                     <h2 class="text-lg font-semibold text-gray-800">
-                                        {{ chapter.order }}. {{ chapter.title }}
+                                        {{ chapter.title }}
                                     </h2>
                                     <p class="text-sm text-gray-500">{{ chapter.description }}</p>
                                 </div>
 
                                 <div class="flex items-center gap-3">
                                     <span
-                                        :class="chapter.is_free ? 'bg-green-100 text-green-600' : 'bg-indigo-100 text-indigo-600'"
+                                        :class="chapter.is_free ? 'bg-green-100 text-teal' : 'bg-indigo-100 text-indigo-600'"
                                         class="px-3 py-1 rounded-full text-sm">
                                         {{ chapter.is_free ? 'Miễn phí' : formatCurrency(chapter.price) }}
                                     </span>
@@ -104,7 +104,8 @@
                                                 : 'bg-gray-100 opacity-60 cursor-not-allowed'
                                         ]">
                                         <div>
-                                            <p class="font-medium text-gray-800 py-2">Bài {{ index+1 }}: {{ lesson.title }}</p>
+                                            <p class="font-medium text-gray-800 py-2">Bài {{ index + 1 }}: {{ lesson.title
+                                                }}</p>
                                             <p class="text-xs text-gray-500"></p>
 
                                             <p v-if="!lesson.is_unlocked" class="text-xs text-red-500">
@@ -113,8 +114,8 @@
                                         </div>
 
                                         <div class="absolute bottom-2 right-4">
-                                            <button 
-                                                class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-teal-400 text-white shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl">
+                                            <button
+                                                class="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-l from-sky-500 to-indigo-500 text-white shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                                     viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -209,10 +210,6 @@ const loadData = async () => {
         const res = await axios.get(`/courses/${route.params.slug}`)
         course.value = res.data
         chapters.value = res.data.chapters
-        
-        chapters.value.lessons.is_unlocked = true;
-        console.log(chapters.value);
-        
 
     } catch (e) {
         error.value = e.response?.data?.message || 'Lỗi tải dữ liệu'
@@ -222,21 +219,21 @@ const loadData = async () => {
 }
 
 const enrollCourse = async () => {
-  try {
-    const res = await axios.post(`/courses/${course.value.id}/enroll`)
+    try {
+        const res = await axios.post(`/courses/${course.value.id}/enroll`)
 
-    toaster.success(res.data.message)
+        toaster.success(res.data.message)
 
-    await loadData()
+        await loadData()
 
-  } catch (err) {
-    console.log(err)
-  }
+    } catch (err) {
+        console.log(err)
+    }
 }
 
 
 const navigateToDetail = (id, unlocked) => {
-    // if (!unlocked) return
+    if (!unlocked) return
     router.push(`/courses/${route.params.slug}/lessons/${id}`)
     console.log('Go lesson', id)
     // router.push(`/lesson/${id}`)
