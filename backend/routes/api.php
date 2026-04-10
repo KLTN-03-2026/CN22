@@ -1,38 +1,38 @@
 <?php
 
+use App\Http\Controllers\Admin\ADChapterController;
+use App\Http\Controllers\Admin\ADCourseController;
+use App\Http\Controllers\Admin\ADLessonController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\EnrollmentController;
-use App\Http\Controllers\QuizController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => '/admin'], function () {
-    // Course
-    Route::get('/courses', [CourseController::class, 'index2']);
-    Route::post('/courses', [CourseController::class, 'store']);
-    Route::put('/courses/{course}', [CourseController::class, 'update']);
-    Route::delete('/courses/{course}', [CourseController::class, 'destroy']);
+Route::middleware('auth:sanctum', 'role:admin')->prefix('/admin')->group(function () {
 
-    // Topic
-    Route::scopeBindings()->group(function () {
-        Route::get('/courses/{course}/topics', [ChapterController::class, 'index']);
-        Route::post('/courses/{course}/topics', [ChapterController::class, 'store']);
-        Route::put('/courses/{course}/topics/{topic}', [ChapterController::class, 'update']);
-        Route::delete('/courses/{course}/topics/{topic}', [ChapterController::class, 'destroy']);
-    });
+    // ===== COURSE =====
+    Route::get('/courses', [ADCourseController::class, 'index']);
+    Route::post('/courses', [ADCourseController::class, 'store']);
+    Route::get('/courses/{course}', [ADCourseController::class, 'show']);
+    Route::put('/courses/{course}', [ADCourseController::class, 'update']);
+    Route::delete('/courses/{course}', [ADCourseController::class, 'destroy']);
 
-    // Lesson
-    Route::scopeBindings()->group(function () {
-        Route::get('/topics/{topic}/lessons', [LessonController::class, 'index']);
-        Route::post('/topics/{topic}/lessons', [LessonController::class, 'store']);
-        Route::put('/topics/{topic}/lessons/{lesson}', [LessonController::class, 'update']);
-        Route::delete('/topics/{topic}/lessons/{lesson}', [LessonController::class, 'destroy']);
-    });
+    // ===== CHAPTER =====
+    Route::get('/courses/{course}/chapters', [ADChapterController::class, 'index']);
+    Route::post('/courses/{course}/chapters', [ADChapterController::class, 'store']);
+    Route::put('/chapters/{chapter}', [ADChapterController::class, 'update']);
+    Route::delete('/chapters/{chapter}', [ADChapterController::class, 'destroy']);
 
+    // ===== LESSON =====
+    Route::get('/chapters/{chapter}/lessons', [ADLessonController::class, 'index']);
+    Route::post('/chapters/{chapter}/lessons', [ADLessonController::class, 'store']);
+    Route::put('/lessons/{lesson}', [ADLessonController::class, 'update']);
+    Route::delete('/lessons/{lesson}', [ADLessonController::class, 'destroy']);
+
+    
 });
 
 
@@ -41,6 +41,7 @@ Route::group(['prefix' => '/admin'], function () {
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
 Route::prefix('/auth')->group(function () {
     Route::get('/google', [GoogleAuthController::class, 'redirectToGoogle']);
     Route::get('/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);

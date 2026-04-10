@@ -20,8 +20,8 @@ class CourseRepository
     public function getAll()
     {
         $data = Course::withCount('chapters')
-                        ->where('status', Course::ACTIVE)
-                        ->get();
+            ->where('status', Course::ACTIVE)
+            ->get();
         return $data;
     }
 
@@ -59,5 +59,28 @@ class CourseRepository
             ->where('status', Order::STATUS_PAID)
             ->pluck('chapter_id')
             ->toArray();
+    }
+
+
+    public function create($data)
+    {
+        return Course::create($data);
+    }
+
+    public function find($id)
+    {
+        return Course::findOrFail($id);
+    }
+
+    public function update($id, $data)
+    {
+        $course = $this->find($id);
+        $course->update($data);
+        return $course;
+    }
+
+    public function delete($id)
+    {
+        return Course::destroy($id);
     }
 }

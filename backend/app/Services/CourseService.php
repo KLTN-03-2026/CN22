@@ -151,8 +151,7 @@ class CourseService
         // nếu chưa có quyền truy cập chương và bài học không phải là free thì khóa
         if (!$hasAccess && !$lesson->chapters->is_free) {
             return [false, 'Chưa mua chương học này'];
-        }
-        elseif (!$hasAccess && $lesson->chapters->is_free) {
+        } elseif (!$hasAccess && $lesson->chapters->is_free) {
             return [false, 'Chưa đăng ký khóa học'];
         }
 
@@ -198,5 +197,40 @@ class CourseService
     {
         return 70; // note: giả lập điểm để test, sau này sẽ lấy từ $progressData
         return $progressData[$lessonId]->score ?? 0;
+    }
+
+
+
+
+
+    //=========================================================================================
+    //=========================================================================================
+    //============================== ADMIN ====================================================
+    //=========================================================================================
+    //=========================================================================================
+
+    public function getAllCourses()
+    {
+        return $this->courseRepo->getAll();
+    }
+
+    public function createCourse($data)
+    {
+        return $this->courseRepo->create($data);
+    }
+
+    public function getCourseById($id)
+    {
+        return $this->courseRepo->find($id);
+    }
+
+    public function updateCourse($id, $data)
+    {
+        return $this->courseRepo->update($id, $data);
+    }
+
+    public function deleteCourse($id)
+    {
+        return $this->courseRepo->delete($id);
     }
 }
