@@ -82,11 +82,37 @@ const routes = [
         props: true,
         beforeEnter: requireStudent
     },
+    //===============================================================
+    //===================== ADMIN ===================================
+    //===============================================================
+    // router/index.js
+    {
+        path: '/admin',
+        meta: { layout: 'admin' },
+        children: [
+            { path: '', component: () => import('../views/admin/Dashboard.vue') },
+            { path: 'courses', component: () => import('../views/admin/Course.vue') },
+            { path: 'users', component: () => import('../views/admin/UserManage.vue') },
+            // ... other admin routes
+        ],
 
+    },
+
+
+
+
+
+
+    // ===============================================================
     {
         path: '/sos',
         component: () => import('../views/client/ExerciseCode.vue'),
         meta: { layout: 'client' },
+    },
+    {
+        path: '/admin/courses/new',
+        component: () => import('../views/admin/CourseForm.vue'),
+        meta: { layout: 'admin' },
     },
     {
         path: '/:pathMatch(.*)*',

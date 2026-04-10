@@ -19,3 +19,10 @@ export async function requireStudent(to, from, next) {
         next('/signin')
     }
 }
+
+
+export async function requireAdmin(to, from, next) {
+    const token = localStorage.getItem('token')
+
+    if(!token) return next('/signin')
+}
