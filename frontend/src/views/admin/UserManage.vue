@@ -8,11 +8,11 @@
                     <p class="mt-1 text-sm text-gray-500">Quản lý tất cả người dùng trên nền tảng</p>
                 </div>
                 <div class="mt-4 sm:mt-0">
-                    <button @click="showAddUserModal = true"
+                    <button @click="userStore.openAddModal()"
                         class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                                d="M18 9v3m0 0v3m0-3h3m-3 0h-3" />
                         </svg>
                         Thêm người dùng
                     </button>
@@ -22,7 +22,6 @@
 
         <!-- Statistics Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            
             <div class="bg-white p-4 rounded-lg shadow">
                 <div class="flex items-center">
                     <div class="p-3 bg-blue-100 rounded-lg">
@@ -110,9 +109,8 @@
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             @change="applyFilters">
                             <option value="">Tất cả</option>
-                            <option value="1">Học viên</option>
-                            <option value="2">Admin</option>
-                            <option value="3">Giảng viên</option>
+                            <option value="admin">Admin</option>
+                            <option value="user">User</option>
                         </select>
                     </div>
 
@@ -125,7 +123,6 @@
                             <option value="">Tất cả</option>
                             <option value="1">Hoạt động</option>
                             <option value="0">Không hoạt động</option>
-                            <option value="2">Bị khóa</option>
                         </select>
                     </div>
                 </div>
@@ -168,10 +165,6 @@
                             class="px-3 py-1 text-sm font-medium text-yellow-700 bg-yellow-100 rounded hover:bg-yellow-200">
                             Vô hiệu hóa
                         </button>
-                        <button @click="bulkAction('block')"
-                            class="px-3 py-1 text-sm font-medium text-red-700 bg-red-100 rounded hover:bg-red-200">
-                            Khóa
-                        </button>
                     </div>
                 </div>
             </div>
@@ -179,7 +172,21 @@
 
         <!-- Users Table -->
         <div class="bg-white shadow rounded-lg overflow-hidden">
-            <div class="overflow-x-auto">
+            <!-- Loading State -->
+            <div v-if="loading" class="p-8 text-center">
+                <div class="inline-flex items-center">
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                        </circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018 0v.01M12 12a8 8 0 018 0v-.01">
+                        </path>
+                    </svg>
+                </div>
+                <span class="ml-2 text-gray-600">Đang tải...</span>
+            </div>
+            <!-- Table Content -->
+            <div v-else class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
@@ -187,20 +194,22 @@
                                 <input type="checkbox" :checked="allSelected" @change="toggleSelectAll"
                                     class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Người dùng</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Vai trò</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Trạng thái</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Ngày tham gia</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Hoạt động cuối</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Thao tác</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Người
+                                dùng</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vai
+                                trò</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng
+                                thái</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày
+                                tham gia</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hoạt
+                                động cuối</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thao
+                                tác</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -210,9 +219,14 @@
                                     @change="toggleUserSelection(user.id)"
                                     class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                #{{ user.id }}
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <img class="h-10 w-10 rounded-full" :src="user.avatar" :alt="user.name">
+                                    <img class="h-10 w-10 rounded-full"
+                                        :src="user.avatar || `https://ui-avatars.com/api/?name=${user.name}&background=random`"
+                                        :alt="user.name">
                                     <div class="ml-4">
                                         <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
                                         <div class="text-sm text-gray-500">{{ user.phone || 'Chưa cập nhật' }}</div>
@@ -229,23 +243,23 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span :class="getStatusBadgeClass(user.status)"
+                                <span :class="getStatusBadgeClass(user.is_active)"
                                     class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full">
-                                    {{ getStatusText(user.status) }}
+                                    {{ user.is_active ? 'Hoạt động' : 'Không hoạt động' }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ formatDate(user.createdAt) }}
+                                {{ formatDate(user.created_at) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ formatLastActive(user.lastActiveAt) }}
+                                {{ formatLastActive(user.last_active_at) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
                                     <button @click="viewUser(user.id)" class="text-blue-600 hover:text-blue-900">
                                         Xem
                                     </button>
-                                    <button @click="editUser(user.id)" class="text-gray-600 hover:text-gray-900">
+                                    <button @click="userStore.openEditModal(user)" class="text-gray-600 hover:text-gray-900">
                                         Sửa
                                     </button>
                                     <button @click="deleteUser(user.id)" class="text-red-600 hover:text-red-900">
@@ -257,185 +271,118 @@
                     </tbody>
                 </table>
             </div>
-
-            <!-- Empty State -->
-            <div v-if="filteredUsers.length === 0" class="text-center py-12">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">Không tìm thấy người dùng</h3>
-                <p class="mt-1 text-sm text-gray-500">Thử điều chỉnh bộ lọc hoặc tìm kiếm với từ khóa khác.</p>
-            </div>
         </div>
 
-        <!-- Pagination -->
-        <div v-if="filteredUsers.length > 0"
-            class="bg-white shadow rounded-lg mt-6 px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-            <div class="flex-1 flex justify-between sm:hidden">
-                <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1"
-                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                    Trước
-                </button>
-                <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages"
-                    class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                    Sau
-                </button>
+
+        <!-- Empty State -->
+        <div v-if="!loading && filteredUsers.length === 0" class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">Không tìm thấy người dùng</h3>
+            <p class="mt-1 text-sm text-gray-500">Thử điều chỉnh bộ lọc hoặc tìm kiếm với từ khóa khác.</p>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div v-if="!loading && filteredUsers.length > 0"
+        class="bg-white shadow rounded-lg mt-6 px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+        <div class="flex-1 flex justify-between sm:hidden">
+            <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1"
+                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                Trước
+            </button>
+            <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages"
+                class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                Sau
+            </button>
+        </div>
+        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm text-gray-700">
+                    Hiển thị
+                    <span class="font-medium">{{ startIndex + 1 }}</span>
+                    đến
+                    <span class="font-medium">{{ endIndex }}</span>
+                    của
+                    <span class="font-medium">{{ filteredUsers.length }}</span>
+                    kết quả
+                </p>
             </div>
-            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                    <p class="text-sm text-gray-700">
-                        Hiển thị
-                        <span class="font-medium">{{ startIndex + 1 }}</span>
-                        đến
-                        <span class="font-medium">{{ endIndex }}</span>
-                        của
-                        <span class="font-medium">{{ filteredUsers.length }}</span>
-                        kết quả
-                    </p>
-                </div>
-                <div>
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1"
-                            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                            <span class="sr-only">Previous</span>
-                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd"
-                                    d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </button>
+            <div>
+                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1"
+                        class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span class="sr-only">Previous</span>
+                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                            aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </button>
 
-                        <button v-for="page in visiblePages" :key="page" @click="goToPage(page)" :class="[
-                            'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
-                            page === currentPage
-                                ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                        ]">
-                            {{ page }}
-                        </button>
+                    <button v-for="page in visiblePages" :key="page" @click="goToPage(page)" :class="[
+                        'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
+                        page === currentPage
+                            ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                    ]">
+                        {{ page }}
+                    </button>
 
-                        <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages"
-                            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                            <span class="sr-only">Next</span>
-                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd"
-                                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </nav>
-                </div>
+                    <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages"
+                        class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span class="sr-only">Next</span>
+                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                            aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </nav>
             </div>
         </div>
+    </div>
 
-        <!-- Per Page Selector -->
-        <div class="mt-4 flex items-center justify-end">
-            <label class="text-sm text-gray-700 mr-2">Hiển thị:</label>
-            <select v-model="itemsPerPage" @change="currentPage = 1"
-                class="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
-            <span class="ml-2 text-sm text-gray-700">kết quả mỗi trang</span>
-        </div>
+    <!-- Per Page Selector -->
+    <div v-if="!loading && filteredUsers.length > 0" class="mt-4 flex items-center justify-end">
+        <label class="text-sm text-gray-700 mr-2">Hiển thị:</label>
+        <select v-model="itemsPerPage" @change="currentPage = 1"
+            class="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+        <span class="ml-2 text-sm text-gray-700">kết quả mỗi trang</span>
     </div>
 
     <!-- Add/Edit User Modal -->
-    <div v-if="showAddUserModal" class="fixed inset-0 z-50 overflow-y-auto">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
-
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-            <div
-                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <form @submit.prevent="handleUserSubmit">
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <div class="sm:flex sm:items-start">
-                            <div class="w-full">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
-                                    {{ editingUser ? 'Chỉnh sửa người dùng' : 'Thêm người dùng mới' }}
-                                </h3>
-
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
-                                        <input v-model="userForm.name" type="text" required
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                            placeholder="Nhập họ và tên">
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                        <input v-model="userForm.email" type="email" required
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                            placeholder="Nhập email">
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Số điện
-                                            thoại</label>
-                                        <input v-model="userForm.phone" type="tel"
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                            placeholder="Nhập số điện thoại">
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Vai trò</label>
-                                        <select v-model="userForm.role" required
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                            <option value="1">Học viên</option>
-                                            <option value="2">Admin</option>
-                                            <option value="3">Giảng viên</option>
-                                        </select>
-                                    </div>
-
-                                    <div v-if="!editingUser">
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
-                                        <input v-model="userForm.password" type="password" required
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                            placeholder="Nhập mật khẩu">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button type="submit"
-                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                            {{ editingUser ? 'Cập nhật' : 'Thêm' }}
-                        </button>
-                        <button type="button" @click="closeUserModal"
-                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                            Hủy
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    <UserModal />
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from "../../stores/useUserAdStore";
+import UserModal from "../../components/UserModal.vue";
 
 const router = useRouter()
+const userStore = useUserStore();
+
 
 // State
 const searchQuery = ref('')
 const selectedUsers = ref([])
 const currentPage = ref(1)
 const itemsPerPage = ref(25)
-const showAddUserModal = ref(false)
+const loading = ref(false)
+const showAddUserModal = ref(true)
 const editingUser = ref(null)
+const submitting = ref(false)
 
 // Filters
 const filters = reactive({
@@ -450,76 +397,20 @@ const userForm = reactive({
     name: '',
     email: '',
     phone: '',
-    role: '1',
+    role: 'user',
     password: ''
 })
 
-// Statistics
+// Statistics - API INTEGRATION POINT
 const stats = reactive({
-    totalUsers: 1247,
-    activeUsers: 892,
-    newUsersThisMonth: 156,
-    premiumUsers: 342
+    totalUsers: 0,
+    activeUsers: 0,
+    newUsersThisMonth: 0,
+    premiumUsers: 0
 })
 
-// Mock data
-const users = ref([
-    {
-        id: 1,
-        name: 'Nguyễn Văn An',
-        email: 'an.nguyen@email.com',
-        phone: '0912345678',
-        avatar: 'https://picsum.photos/seed/user1/100/100.jpg',
-        role: 1,
-        status: 1,
-        createdAt: new Date('2023-01-15'),
-        lastActiveAt: new Date(Date.now() - 1000 * 60 * 30) // 30 minutes ago
-    },
-    {
-        id: 2,
-        name: 'Trần Thị Bình',
-        email: 'binh.tran@email.com',
-        phone: '0923456789',
-        avatar: 'https://picsum.photos/seed/user2/100/100.jpg',
-        role: 1,
-        status: 1,
-        createdAt: new Date('2023-02-20'),
-        lastActiveAt: new Date(Date.now() - 1000 * 60 * 60 * 2) // 2 hours ago
-    },
-    {
-        id: 3,
-        name: 'Lê Văn Cường',
-        email: 'cuong.le@email.com',
-        phone: '0934567890',
-        avatar: 'https://picsum.photos/seed/user3/100/100.jpg',
-        role: 2,
-        status: 1,
-        createdAt: new Date('2023-03-10'),
-        lastActiveAt: new Date(Date.now() - 1000 * 60 * 60 * 24) // 1 day ago
-    },
-    {
-        id: 4,
-        name: 'Phạm Thị Dung',
-        email: 'dung.pham@email.com',
-        phone: '0945678901',
-        avatar: 'https://picsum.photos/seed/user4/100/100.jpg',
-        role: 3,
-        status: 0,
-        createdAt: new Date('2023-04-01'),
-        lastActiveAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3) // 3 days ago
-    },
-    {
-        id: 5,
-        name: 'Hoàng Văn Em',
-        email: 'em.hoang@email.com',
-        phone: '0956789012',
-        avatar: 'https://picsum.photos/seed/user5/100/100.jpg',
-        role: 1,
-        status: 2,
-        createdAt: new Date('2023-04-15'),
-        lastActiveAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7) // 1 week ago
-    }
-])
+// Mock data - sẽ được thay thế bằng API call
+const users = ref([])
 
 // Computed properties
 const filteredUsers = computed(() => {
@@ -536,23 +427,23 @@ const filteredUsers = computed(() => {
 
     // Role filter
     if (filters.role !== '') {
-        filtered = filtered.filter(user => user.role === parseInt(filters.role))
+        filtered = filtered.filter(user => user.role === filters.role)
     }
 
     // Status filter
     if (filters.status !== '') {
-        filtered = filtered.filter(user => user.status === parseInt(filters.status))
+        filtered = filtered.filter(user => user.is_active === (filters.status === '1'))
     }
 
     // Date range filter
     if (filters.dateFrom) {
         const fromDate = new Date(filters.dateFrom)
-        filtered = filtered.filter(user => user.createdAt >= fromDate)
+        filtered = filtered.filter(user => new Date(user.created_at) >= fromDate)
     }
     if (filters.dateTo) {
         const toDate = new Date(filters.dateTo)
         toDate.setHours(23, 59, 59, 999)
-        filtered = filtered.filter(user => user.createdAt <= toDate)
+        filtered = filtered.filter(user => new Date(user.created_at) <= toDate)
     }
 
     return filtered
@@ -594,12 +485,10 @@ const visiblePages = computed(() => {
 // Methods
 const getRoleBadgeClass = (role) => {
     switch (role) {
-        case 1:
-            return 'bg-blue-100 text-blue-800'
-        case 2:
+        case 'admin':
             return 'bg-purple-100 text-purple-800'
-        case 3:
-            return 'bg-green-100 text-green-800'
+        case 'user':
+            return 'bg-blue-100 text-blue-800'
         default:
             return 'bg-gray-100 text-gray-800'
     }
@@ -607,50 +496,28 @@ const getRoleBadgeClass = (role) => {
 
 const getRoleText = (role) => {
     switch (role) {
-        case 1:
-            return 'Học viên'
-        case 2:
+        case 'admin':
             return 'Admin'
-        case 3:
-            return 'Giảng viên'
+        case 'user':
+            return 'User'
         default:
             return 'Không xác định'
     }
 }
 
-const getStatusBadgeClass = (status) => {
-    switch (status) {
-        case 1:
-            return 'bg-green-100 text-green-800'
-        case 0:
-            return 'bg-yellow-100 text-yellow-800'
-        case 2:
-            return 'bg-red-100 text-red-800'
-        default:
-            return 'bg-gray-100 text-gray-800'
-    }
-}
-
-const getStatusText = (status) => {
-    switch (status) {
-        case 1:
-            return 'Hoạt động'
-        case 0:
-            return 'Không hoạt động'
-        case 2:
-            return 'Bị khóa'
-        default:
-            return 'Không xác định'
-    }
+const getStatusBadgeClass = (isActive) => {
+    return isActive
+        ? 'bg-green-100 text-green-800'
+        : 'bg-yellow-100 text-yellow-800'
 }
 
 const formatDate = (date) => {
-    return new Intl.DateTimeFormat('vi-VN').format(date)
+    return new Intl.DateTimeFormat('vi-VN').format(new Date(date))
 }
 
 const formatLastActive = (date) => {
     const now = new Date()
-    const diff = now - date
+    const diff = now - new Date(date)
     const minutes = Math.floor(diff / 60000)
     const hours = Math.floor(diff / 3600000)
     const days = Math.floor(diff / 86400000)
@@ -707,27 +574,36 @@ const debouncedSearch = (() => {
     }
 })()
 
-const bulkAction = (action) => {
+const bulkAction = async (action) => {
     if (selectedUsers.value.length === 0) return
 
     const actionText = action === 'activate' ? 'kích hoạt' : action === 'deactivate' ? 'vô hiệu hóa' : 'khóa'
     const confirmMessage = `Bạn có chắc muốn ${actionText} ${selectedUsers.value.length} người dùng đã chọn?`
 
     if (confirm(confirmMessage)) {
-        // In a real app, this would be an API call
-        console.log(`Bulk ${action} users:`, selectedUsers.value)
+        try {
+            // API INTEGRATION POINT - Bulk update users
+            // await api.post('/admin/users/bulk-update', {
+            //   userIds: selectedUsers.value,
+            //   action: action
+            // })
 
-        // Update local data for demo
-        selectedUsers.value.forEach(userId => {
-            const user = users.value.find(u => u.id === userId)
-            if (user) {
-                if (action === 'activate') user.status = 1
-                else if (action === 'deactivate') user.status = 0
-                else if (action === 'block') user.status = 2
-            }
-        })
+            // Mock update local state for demo
+            selectedUsers.value.forEach(userId => {
+                const user = users.value.find(u => u.id === userId)
+                if (user) {
+                    if (action === 'activate') user.is_active = true
+                    else if (action === 'deactivate') user.is_active = false
+                    // Note: Delete action sẽ được xử lý riêng
+                }
+            })
 
-        selectedUsers.value = []
+            selectedUsers.value = []
+            alert(`${actionText} thành công!`)
+        } catch (error) {
+            console.error('Bulk action error:', error)
+            alert('Có lỗi xảy ra. Vui lòng thử lại.')
+        }
     }
 }
 
@@ -742,17 +618,27 @@ const editUser = (userId) => {
         userForm.name = user.name
         userForm.email = user.email
         userForm.phone = user.phone || ''
-        userForm.role = user.role.toString()
+        userForm.role = user.role
         showAddUserModal.value = true
     }
 }
 
-const deleteUser = (userId) => {
+const deleteUser = async (userId) => {
     if (confirm('Bạn có chắc muốn xóa người dùng này?')) {
-        // In a real app, this would be an API call
-        const index = users.value.findIndex(u => u.id === userId)
-        if (index > -1) {
-            users.value.splice(index, 1)
+        try {
+            // API INTEGRATION POINT - Delete user
+            // await api.delete(`/admin/users/${userId}`)
+
+            // Mock delete for demo
+            const index = users.value.findIndex(u => u.id === userId)
+            if (index > -1) {
+                users.value.splice(index, 1)
+            }
+
+            alert('Xóa người dùng thành công!')
+        } catch (error) {
+            console.error('Delete user error:', error)
+            alert('Có lỗi xảy ra. Vui lòng thử lại.')
         }
     }
 }
@@ -764,55 +650,156 @@ const closeUserModal = () => {
     userForm.name = ''
     userForm.email = ''
     userForm.phone = ''
-    userForm.role = '1'
+    userForm.role = 'user'
     userForm.password = ''
 }
 
 const handleUserSubmit = async () => {
+    console.log('Form data:', { ...userForm, editingUser: editingUser.value });
+    submitting.value = true
     try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
         if (editingUser.value) {
-            // Update existing user
+            // API INTEGRATION POINT - Update user
+            // await api.put(`/admin/users/${editingUser.value.id}`, {
+            //   name: userForm.name,
+            //   email: userForm.email,
+            //   phone: userForm.phone,
+            //   role: userForm.role
+            // })
+
+            // Update local state for demo
             const user = users.value.find(u => u.id === editingUser.value.id)
             if (user) {
                 user.name = userForm.name
                 user.email = userForm.email
                 user.phone = userForm.phone
-                user.role = parseInt(userForm.role)
+                user.role = userForm.role
             }
+
             alert('Cập nhật người dùng thành công!')
         } else {
-            // Create new user
+            // API INTEGRATION POINT - Create user
+            // const response = await api.post('/admin/users', {
+            //   name: userForm.name,
+            //   email: userForm.email,
+            //   phone: userForm.phone,
+            //   password: userForm.password,
+            //   role: userForm.role
+            // })
+
+            // Mock create for demo
             const newUser = {
                 id: Date.now(),
                 name: userForm.name,
                 email: userForm.email,
                 phone: userForm.phone,
-                avatar: `https://picsum.photos/seed/user${Date.now()}/100/100.jpg`,
-                role: parseInt(userForm.role),
-                status: 1,
-                createdAt: new Date(),
-                lastActiveAt: new Date()
+                avatar: `https://ui-avatars.com/api/?name=${userForm.name}&background=random`,
+                role: userForm.role,
+                is_active: true,
+                created_at: new Date().toISOString(),
+                last_active_at: new Date().toISOString()
             }
             users.value.push(newUser)
+
             alert('Thêm người dùng thành công!')
         }
 
         closeUserModal()
     } catch (error) {
+        console.error('Submit user error:', error)
         alert('Có lỗi xảy ra. Vui lòng thử lại.')
+    } finally {
+        submitting.value = false
     }
 }
+
+// Fetch users data - API INTEGRATION POINT
+const fetchUsers = async () => {
+    loading.value = true
+    try {
+        // API INTEGRATION POINT - Fetch users with filters
+        // const response = await api.get('/admin/users', {
+        //   params: {
+        //     search: searchQuery.value,
+        //     role: filters.role,
+        //     status: filters.status,
+        //     date_from: filters.dateFrom,
+        //     date_to: filters.dateTo,
+        //     page: currentPage.value,
+        //     per_page: itemsPerPage.value
+        //   }
+        // })
+
+        // Mock data for demo
+        const mockUsers = [
+            {
+                id: 1,
+                name: 'Nguyễn Văn An',
+                email: 'an.nguyen@example.com',
+                phone: '0912345678',
+                role: 'user',
+                is_active: true,
+                created_at: '2023-01-15T10:30:00Z',
+                last_active_at: '2023-12-10T15:45:00Z'
+            },
+            {
+                id: 2,
+                name: 'Trần Thị Bình',
+                email: 'binh.tran@example.com',
+                phone: '0923456789',
+                role: 'admin',
+                is_active: true,
+                created_at: '2023-02-20T09:15:00Z',
+                last_active_at: '2023-12-10T14:30:00Z'
+            }
+            // ... thêm users khác
+        ]
+
+        users.value = mockUsers
+
+        // Update stats based on fetched data
+        stats.totalUsers = users.value.length
+        stats.activeUsers = users.value.filter(u => u.is_active).length
+        stats.newUsersThisMonth = users.value.filter(u => {
+            const createdMonth = new Date(u.created_at).getMonth()
+            const currentMonth = new Date().getMonth()
+            return createdMonth === currentMonth
+        }).length
+        stats.premiumUsers = users.value.filter(u => u.role === 'premium').length // Nếu có premium users
+
+    } catch (error) {
+        console.error('Fetch users error:', error)
+    } finally {
+        loading.value = false
+    }
+}
+
+// Fetch stats data - API INTEGRATION POINT
+const fetchStats = async () => {
+    try {
+        // API INTEGRATION POINT - Fetch dashboard stats
+        // const response = await api.get('/admin/dashboard/stats')
+        // Object.assign(stats, response.data)
+
+        // Mock stats for demo
+        stats.totalUsers = 1247
+        stats.activeUsers = 892
+        stats.newUsersThisMonth = 156
+        stats.premiumUsers = 342
+
+    } catch (error) {
+        console.error('Fetch stats error:', error)
+    }
+}
+
+// Initialize
+onMounted(() => {
+    fetchUsers()
+    fetchStats()
+})
 
 // Watch for changes
 watch(itemsPerPage, () => {
     currentPage.value = 1
-})
-
-// Initialize
-onMounted(() => {
-    // In a real app, this would fetch data from API
 })
 </script>
