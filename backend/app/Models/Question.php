@@ -9,8 +9,8 @@ class Question extends Model
     protected $table = 'questions';
     protected $fillable = [
         'quiz_id',
-        'question_text',
-        'question_type',
+        'content',
+        'type',
     ];
 
     const TYPE_MULTIPLE_CHOICE = 1;
@@ -19,5 +19,10 @@ class Question extends Model
     public function quiz()
     {
         return $this->belongsTo(Quiz::class, 'quiz_id');
+    }
+
+    public function answers()
+    {
+        return $this->hasMany(Answer::class, 'question_id');
     }
 }

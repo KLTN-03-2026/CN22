@@ -20,12 +20,12 @@ return new class extends Migration
             $table->decimal('total_score', 8, 2)->default(0);
             $table->decimal('pass_score', 8, 2)->default(0);
             $table->integer('max_times')->default(0); // 0 means unlimited
-            $table->boolean('suffle_questions')->default(false);
+            $table->boolean('shuffle_questions')->default(false);
             $table->integer('is_active')->default(1); // 0: inactive, 1: active
             $table->timestamps();
         });
     }
-
+//         quizzes (id, title, course_id, lesson_id, time_limit, total_score, pass_score, max_times, shuffle_questions, is_active)
     /**
      * Reverse the migrations.
      */

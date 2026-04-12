@@ -11,9 +11,9 @@ class QuizResult extends Model
         'quiz_id',
         'user_id',
         'score',
-        'progress',
         'started_at',
-        'completed_at',
+        'submitted_at',
+        'is_passed'
     ];
 
     public function quiz()

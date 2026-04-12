@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+// user_answers (id, result_id, question_id, answer_id, is_correct, score)
         Schema::create('user_answers', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('quiz_result_id');
+            $table->bigInteger('result_id');
             $table->bigInteger('question_id');
-            $table->bigInteger('selected_answer_id')->nullable(); // for multiple choice questions
+            $table->bigInteger('answer_id')->nullable(); // for multiple choice questions
             $table->boolean('is_correct')->default(false);
             $table->decimal('score', 8, 2)->default(0);
             $table->timestamps();

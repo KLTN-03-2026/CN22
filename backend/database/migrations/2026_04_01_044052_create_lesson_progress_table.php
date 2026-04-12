@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('lesson_id');
+            $table->decimal('score', 8, 2)->default(0);
             $table->integer('status')->default(0); // 0: not started, 1: in progress, 2: completed
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();

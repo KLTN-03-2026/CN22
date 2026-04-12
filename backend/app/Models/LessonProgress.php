@@ -11,6 +11,7 @@ class LessonProgress extends Model
     protected $fillable = [
         'user_id',
         'lesson_id',
+        'score',
         'status',
         'completed_at',
     ];
@@ -18,7 +19,7 @@ class LessonProgress extends Model
     const NOT_STARTED = 0;
     const IN_PROGRESS = 1;
     const COMPLETED = 2;
-    
+
     // Quan hệ với User
     public function user()
     {

@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\QuizController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -32,13 +33,13 @@ Route::middleware('auth:sanctum', 'role:admin')->prefix('/admin')->group(functio
     Route::put('/lessons/{lesson}', [ADLessonController::class, 'update']);
     Route::delete('/lessons/{lesson}', [ADLessonController::class, 'destroy']);
 
-    
+
 });
 
 
 // Route công khai
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/auth/user', function (Request $request) {
     return $request->user();
 });
 
@@ -61,8 +62,11 @@ Route::middleware('auth:sanctum', 'role:student')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::get('/courses/{slug}', [CourseController::class, 'show']);
 
-    Route::post('/courses/{id}/enroll', [EnrollmentController::class, 'enroll']);
+    Route::post('/courses/{course}/enroll', [EnrollmentController::class, 'enroll']);
     Route::get('/courses/{slug}/lessons/{id}', [LessonController::class, 'show']);
+
+    Route::get('/lessons/{lesson}/quiz', [QuizController::class, 'getByLesson']);
+    Route::post('/quizzes/{quiz}/submit', [QuizController::class, 'submit']);
 });
 
 // // Public routes

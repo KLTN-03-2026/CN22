@@ -15,7 +15,7 @@ class Quiz extends Model
         'total_score',
         'pass_score',
         'max_times',
-        'suffle_questions',
+        'shuffle_questions',
         'is_active',
     ];
 
@@ -23,4 +23,5 @@ class Quiz extends Model
     {
         return $this->hasMany(Question::class, 'quiz_id');
     }
+    
 }

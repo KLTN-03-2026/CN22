@@ -8,16 +8,16 @@ class UserAnswer extends Model
 {
     protected $table = 'user_answers';
     protected $fillable = [
-        'quiz_result_id',
+        'result_id',
         'question_id',
-        'selected_answer_id',
+        'answer_id',
         'is_correct',
         'score',
     ];
 
     public function quizResult()
     {
-        return $this->belongsTo(QuizResult::class, 'quiz_result_id');
+        return $this->belongsTo(QuizResult::class, 'result_id');
     }
 
     public function question()
@@ -25,8 +25,8 @@ class UserAnswer extends Model
         return $this->belongsTo(Question::class, 'question_id');
     }
 
-    public function selectedAnswer()
+    public function answer()
     {
-        return $this->belongsTo(Answer::class, 'selected_answer_id');
+        return $this->belongsTo(Answer::class, 'answer_id');
     }
 }

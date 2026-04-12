@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
+// quiz_results (id, user_id, quiz_id, score, started_at, submitted_at, is_passed)
+
         Schema::create('quiz_results', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('quiz_id');
             $table->bigInteger('user_id');
             $table->decimal('score', 8, 2)->default(0);
-            $table->decimal('progress', 5, 2)->default(0); // percentage of completion
             $table->timestamp('started_at')->nullable();
-            $table->timestamp('completed_at')->nullable();
+            $table->timestamp('submitted_at')->nullable();
+            $table->boolean('is_passed');
             $table->timestamps();
         });
     }

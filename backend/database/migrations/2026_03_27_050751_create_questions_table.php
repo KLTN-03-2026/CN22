@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+// questions (id, quiz_id, content, type (mcq/code))
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('quiz_id');
-            $table->string('question_text');
-            $table->integer('question_type'); // multiple_choice, short_answer mcq / code
+            $table->string('content');
+            $table->integer('type'); // multiple_choice, short_answer mcq / code
             $table->timestamps();
         });
     }
