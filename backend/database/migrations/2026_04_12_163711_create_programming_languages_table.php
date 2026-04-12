@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('code_answers', function (Blueprint $table) {
+        Schema::create('programming_languages', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('question_id');
-            $table->text('description')->nullable();
-            $table->text('input_format')->nullable();
-            $table->text('output_format')->nullable();
+            $table->string('name');
+            $table->string('version');
+            $table->string('compiler_options');
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('code_answers');
+        Schema::dropIfExists('programming_languages');
     }
 };

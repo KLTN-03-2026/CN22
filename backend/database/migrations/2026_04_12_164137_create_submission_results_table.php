@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('test_cases', function (Blueprint $table) {
+        Schema::create('submission_results', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('code_id');
-            $table->text('input');
-            $table->text('expected_output');
+            $table->bigInteger('submission_id');
+            $table->bigInteger('testcase_id');
+            $table->boolean('passed');
+            $table->text('actual_output');
+            $table->text('error_message');
             $table->timestamps();
         });
     }
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('test_cases');
+        Schema::dropIfExists('submission_results');
     }
 };

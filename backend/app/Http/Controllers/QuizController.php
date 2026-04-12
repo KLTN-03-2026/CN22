@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\QuizService;
 use Illuminate\Http\Request;
+use App\Services\QuizService;
 
 class QuizController extends Controller
 {
@@ -14,23 +14,32 @@ class QuizController extends Controller
         $this->quizService = $quizService;
     }
 
+    // ===== GET QUIZ =====
     public function getByLesson($lessonId)
     {
-        $quiz = $this->quizService->getQuizByLesson($lessonId);
-
-        return response()->json($quiz);
+        return response()->json(
+            $this->quizService->getQuizByLesson($lessonId)
+        );
     }
 
+    // ===== START QUIZ =====
+    public function start($quizId, Request $request)
+    {
+        return response()->json(
+            $this->quizService->startQuiz($quizId, $request->user())
+        );
+    }
+
+    // ===== SUBMIT QUIZ =====
     public function submit($quizId, Request $request)
     {
-        $user = $request->user();
-
-        $result = $this->quizService->submitQuiz(
-            $quizId,
-            $user,
-            $request->input('answers', [])
+        return response()->json(
+            $this->quizService->submitQuiz(
+                $quizId,
+                $request->user(),
+                $request->input('answers', []),
+                $request->input('attempt_id')
+            )
         );
-
-        return response()->json($result);
     }
 }

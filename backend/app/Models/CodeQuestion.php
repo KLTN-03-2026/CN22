@@ -4,14 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CodeAnswer extends Model
+class CodeQuestion extends Model
 {
-    protected $table = 'code_answers';
+    protected $table = 'coding_questions';
     protected $fillable = [
         'question_id',
         'description',
-        'input_format',
-        'output_format',
+        'time_limit',
+        'memory_limit',
+        'sample_input',
+        'sample_output'
     ];
 
     public function question()

@@ -148,31 +148,27 @@ class CourseService
     // Kiểm tra điều kiện mở khóa bài học
     private function checkLessonUnlock($lesson, $index, $lessons, $hasAccess, $progressData)
     {
-        // nếu chưa có quyền truy cập chương và bài học không phải là free thì khóa
-        if (!$hasAccess && !$lesson->chapters->is_free) {
-            return [false, 'Chưa mua chương học này'];
-        } elseif (!$hasAccess && $lesson->chapters->is_free) {
-            return [false, 'Chưa đăng ký khóa học'];
+        // ===== 1. Không có quyền truy cập =====
+        if (!$hasAccess) {
+            return [false, 'Chưa mua khóa học hoặc chương'];
         }
 
-        // nếu là bài học đầu tiên của chương đầu tiên và chương đó miễn phí thì luôn mở khóa
-        if ($index == 0 && $lesson->chapters->is_free) {
+        // ===== 2. Bài đầu tiên luôn mở =====
+        if ($index === 0) {
             return [true, null];
         }
 
-        // nếu chưa hoàn thành bài học trước thì khóa, với bài học đầu tiên của chương đầu tiên thì không cần kiểm tra, còn lại thì phải kiểm tra bài học trước đó đã hoàn thành chưa
-        if ($index >= 0) {
-            $prevChapter = $lesson->chapters;
-            $prevLessons = $prevChapter->lessons->sortBy('order')->values();
-            $prevLesson = $prevLessons->last();
-            $prevScore = $progressData[$prevLesson->id]->score ?? 0;
+        // ===== 3. Lấy bài trước =====
+        $prevLesson = $lessons[$index - 1];
 
-            if ($prevScore < $prevLesson->score_requirement) {
-                return [false, 'Cần hoàn thành bài trước để mở khóa'];
-            }
+        $prevScore = $progressData[$prevLesson->id]->score ?? 0;
+
+        // ===== 4. Check điều kiện =====
+        if ($prevScore >= $prevLesson->score_requirement) {
+            return [true, null];
         }
 
-        return [true, null];
+        return [false, 'Cần đạt >= ' . $prevLesson->score_requirement . '% bài trước'];
     }
 
     private function calculateCourseProgress($chapters)

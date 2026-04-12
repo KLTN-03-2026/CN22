@@ -8,7 +8,7 @@ class TestCase extends Model
 {
     protected $table = 'test_cases';
     protected $fillable = [
-        'exercise_id',
+        'code_id',
         'input',
         'expected_output',
         'is_hidden',

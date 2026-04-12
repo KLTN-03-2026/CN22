@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ADCourseController;
 use App\Http\Controllers\Admin\ADLessonController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CodeController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\EnrollmentController;
@@ -32,8 +33,6 @@ Route::middleware('auth:sanctum', 'role:admin')->prefix('/admin')->group(functio
     Route::post('/chapters/{chapter}/lessons', [ADLessonController::class, 'store']);
     Route::put('/lessons/{lesson}', [ADLessonController::class, 'update']);
     Route::delete('/lessons/{lesson}', [ADLessonController::class, 'destroy']);
-
-
 });
 
 
@@ -66,11 +65,13 @@ Route::middleware('auth:sanctum', 'role:student')->group(function () {
     Route::get('/courses/{slug}/lessons/{id}', [LessonController::class, 'show']);
 
     Route::get('/lessons/{lesson}/quiz', [QuizController::class, 'getByLesson']);
+    Route::post('/quizzes/{quiz}/start', [QuizController::class, 'start']);
     Route::post('/quizzes/{quiz}/submit', [QuizController::class, 'submit']);
+
+    Route::get('/lessons/{lesson}/coding', [CodeController::class, 'getByLesson']);
+    Route::post('/code/submit', [CodeController::class, 'submit']);
 });
 
-// // Public routes
-// GET /api/courses/{slug}/chapters - Danh sách chương của khóa học
 
 // // Student routes (yêu cầu đăng nhập)
 // POST /api/courses/{id}/enroll - Đăng ký khóa học

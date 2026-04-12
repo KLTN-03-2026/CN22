@@ -31,15 +31,14 @@ class QuizService
             'id' => $quiz->id,
             'title' => $quiz->title,
             'time_limit' => $quiz->time_limit,
-            'questions' => $quiz->questions->map(function ($q) {
+            'questions' => $quiz->questions->shuffle()->map(function ($q) {
                 return [
                     'id' => $q->id,
                     'content' => $q->content,
-                    'answers' => $q->answers->map(function ($a) {
+                    'answers' => $q->answers->shuffle()->map(function ($a) {
                         return [
                             'id' => $a->id,
                             'content' => $a->content
-                            // KHÔNG trả is_correct
                         ];
                     })
                 ];
@@ -47,6 +46,25 @@ class QuizService
         ];
     }
 
+    // public function startQuiz($quizId, $user)
+    // {
+    //     $quiz = $this->quizRepo->findById($quizId);
+
+    //     $attemptCount = $this->quizRepo->countUserAttempts($quizId, $user->id);
+
+    //     if ($quiz->max_times && $attemptCount >= $quiz->max_times) {
+    //         throw new \Exception('Bạn đã hết lượt làm bài');
+    //     }
+
+    //     return $this->quizRepo->createQuizResult([
+    //         'user_id' => $user->id,
+    //         'quiz_id' => $quizId,
+    //         'score' => 0,
+    //         'started_at' => now(),
+    //         'submitted_at' => null,
+    //         'is_passed' => 0
+    //     ]);
+    // }
     public function submitQuiz($quizId, $user, $answers)
     {
         return DB::transaction(function () use ($quizId, $user, $answers) {
@@ -120,6 +138,17 @@ class QuizService
                     $quiz->lesson_id,
                     $score
                 );
+            }
+            // ==== 7. Check time limit ====
+            $startTime = strtotime($result->started_at);
+            $now = time();
+
+            if ($quiz->time_limit) {
+                $limit = $quiz->time_limit * 60;
+
+                if (($now - $startTime) > $limit) {
+                    throw new \Exception('Hết thời gian làm bài');
+                }
             }
 
             return [
