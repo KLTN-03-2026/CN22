@@ -1,12 +1,21 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useQuizStore } from '../../stores/useQuizStore'
+import { useRoute} from 'vue-router'
 
 const quizStore = useQuizStore()
+const route = useRoute()
+
+const isComplete = computed(() => {
+  if (!quizStore.quiz) return false
+  return quizStore.quiz.questions.every(
+    q => quizStore.answers[q.id]
+  )
+})
 
 onMounted(() => {
     // truyền lessonId từ route hoặc parent
-    quizStore.fetchQuiz(1)
+    quizStore.fetchQuiz(route.params.id)
 })
 
 const submitQuiz = () => {
@@ -37,7 +46,7 @@ const submitQuiz = () => {
         </div>
 
         <!-- Submit -->
-        <button @click="submitQuiz" :disabled="quizStore.loading"
+        <button @click="submitQuiz" :disabled="!isComplete || quizStore.loading"
             class="w-full bg-indigo-600 text-white py-2 rounded-lg">
 
             {{ quizStore.loading ? 'Đang chấm...' : 'Nộp bài' }}

@@ -1,3 +1,40 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useQuizStore } from '../../stores/useQuizStore'
+
+const store = useQuizStore()
+
+const editorRef = ref(null)
+let editor
+
+const code = ref('function sum(a, b) { return a + b }')
+
+onMounted(async () => {
+  await store.fetchQuestion(1) // lesson_id
+
+  // init editor (giữ nguyên)
+})
+
+onMounted(() => {
+    editor = new EditorView({
+        doc: code.value,
+        extensions: [basicSetup, javascript()],
+        parent: editorRef.value,
+        dispatch: (tr) => {
+            editor.update([tr])
+            code.value = editor.state.doc.toString()
+        }
+    })
+
+    // load saved code
+    const saved = localStorage.getItem('code')
+    if (saved) {
+        editor.dispatch({
+            changes: { from: 0, to: editor.state.doc.length, insert: saved }
+        })
+    }
+})
+</script>
 <template>
     <div class="bg-white rounded-xl shadow p-4 space-y-4">
 
@@ -46,72 +83,3 @@
 
     </div>
 </template>
-
-<script setup>
-import { ref, onMounted } from 'vue'
-
-import { EditorView, basicSetup } from 'codemirror'
-import { javascript } from '@codemirror/lang-javascript'
-
-const editorRef = ref(null)
-let editor
-
-const code = ref('// viết hàm cộng 2 số\nfunction sum(a, b) {\n  return a + b\n}')
-
-const testCases = ref([
-    { input: '1,2', expected: 3, output: null, passed: false },
-    { input: '5,7', expected: 12, output: null, passed: false }
-])
-
-const result = ref(null)
-
-onMounted(() => {
-    editor = new EditorView({
-        doc: code.value,
-        extensions: [basicSetup, javascript()],
-        parent: editorRef.value,
-        dispatch: (tr) => {
-            editor.update([tr])
-            code.value = editor.state.doc.toString()
-        }
-    })
-
-    // load saved code
-    const saved = localStorage.getItem('code')
-    if (saved) {
-        editor.dispatch({
-            changes: { from: 0, to: editor.state.doc.length, insert: saved }
-        })
-    }
-})
-
-const runCode = () => {
-    try {
-        const userFunc = new Function(code.value + '; return sum')()
-
-        testCases.value.forEach(tc => {
-            const [a, b] = tc.input.split(',').map(Number)
-            const output = userFunc(a, b)
-            tc.output = output
-            tc.passed = output === tc.expected
-        })
-    } catch (e) {
-        alert('Code lỗi!')
-    }
-}
-
-const submitCode = () => {
-    runCode()
-
-    const passedCount = testCases.value.filter(tc => tc.passed).length
-    const score = Math.round((passedCount / testCases.value.length) * 100)
-
-    result.value = {
-        score,
-        passed: score >= 70
-    }
-
-    // save code
-    localStorage.setItem('code', code.value)
-}
-</script>
