@@ -139,8 +139,6 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
-import api from '../../router/api.js'
 import { useAuthStore } from '../../stores/useAuthStore'
 
 
@@ -201,14 +199,13 @@ if (token) {
 
     api.get('/')
         .then(() => {
-            router.push('/')
+            router.push("/")
         })
         .catch(() => {
             localStorage.removeItem('token')
             router.push('/signin')
         })
 }
-
 const handleSubmit = async () => {
     if (!validate()) return
 
@@ -216,42 +213,28 @@ const handleSubmit = async () => {
     generalError.value = ''
 
     try {
-        const res = await axios.post('http://localhost:8000/api/auth/login', {
+        await auth.login({
             email: form.email,
             password: form.password
         })
 
-        const token = res.data.token
-
-        // lưu token
-        localStorage.setItem('token', token)
-
-        // set header mặc định
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-
-        // lưu vào pinia
-        auth.login(token)
-
-        // chuyển trang
-        router.push('/')
-
+        router.push("/")
     } catch (err) {
-        generalError.value =
-            err.response?.data?.message || 'Đăng nhập thất bại'
+        generalError.value = err.response?.data?.message 
+            || 'Đăng nhập thất bại. Vui lòng thử lại.'
     } finally {
         isSubmitting.value = false
     }
 }
 
-
 onMounted(() => {
     emailRef.value?.focus()
 
-    const token = localStorage.getItem('token')
-
-    if (token) {
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-        auth.fetchUser()
+    // Nếu đã có token → thử lấy thông tin user
+    if (auth.token) {
+        auth.fetchUser().catch(() => {
+            // token invalid → logout
+        })
     }
 })
 </script>

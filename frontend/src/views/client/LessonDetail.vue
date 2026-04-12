@@ -84,7 +84,7 @@
                             <h3 class="text-lg font-semibold text-gray-800 mb-4">Bài tập</h3>
 
                             <!-- QUIZ COMPONENT -->
-                            <ExerciseQuiz @submitted="handleQuizResult" />
+                            <ExerciseQuiz/>
 
                             <!-- CODE COMPONENT -->
                             <!-- <ExerciseCode v-if="lesson.exercise?.type === 'code'" @submitted="handleCodeResult" /> -->
@@ -112,8 +112,9 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from '../../router/api.js'
 import ExerciseQuiz from './ExerciseQuiz.vue'
-import ExerciseCode from './ExerciseCode.vue'
+import { useQuizStore } from '../../stores/useQuizStore'
 
+const quizStore = useQuizStore()
 const route = useRoute()
 const router = useRouter()
 
@@ -122,47 +123,6 @@ const isLoading = ref(false)
 const error = ref(null)
 const exerciseResult = ref(null)
 const isSidebarOpen = ref(true)
-
-const fetchLessonFromAPI = () => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve({
-                id: 1,
-                title: 'Giới thiệu Composition API',
-                content: '<h2>1. Giới thiệu</h2><p>Composition API giúp bạn tổ chức code tốt hơn...</p><h2>2. Ví dụ</h2><p>Nội dung dài như LeetCode...</p>',
-                videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-                isUnlocked: true,
-                scoreRequirement: 70,
-                progress: { percentage: 40 },
-                exercise: {
-                    type: 'quiz',
-                    questions: [
-                        {
-                            id: 1,
-                            question: 'Vue 3 dùng API nào?',
-                            correct: 2,
-                            options: [
-                                { id: 1, text: 'Options API' },
-                                { id: 2, text: 'Composition API' }
-                            ]
-                        }
-                    ]
-                },
-                courseStructure: [
-                    {
-                        id: 1,
-                        title: 'Chương 1',
-                        lessons: [
-                            { id: 1, title: 'Intro', isUnlocked: true, completed: false },
-                            { id: 2, title: 'Setup', isUnlocked: false, completed: false }
-                        ]
-                    }
-                ]
-            },
-            )
-        }, 1000)
-    })
-}
 
 const loadLesson = async () => {
     isLoading.value = true
@@ -181,29 +141,6 @@ const loadLesson = async () => {
     }
 }
 
-const handleQuizResult = (result) => {
-    exerciseResult.value = result
-
-    if (result.passed) {
-        // mark current lesson completed
-        lesson.value.courseStructure.forEach(ch => {
-            ch.lessons.forEach(l => {
-                if (l.id === lesson.value.id) {
-                    l.completed = true
-                }
-            })
-        })
-
-        // unlock next lesson
-        lesson.value.courseStructure.forEach(ch => {
-            for (let i = 0; i < ch.lessons.length; i++) {
-                if (ch.lessons[i].id === lesson.value.id && ch.lessons[i + 1]) {
-                    ch.lessons[i + 1].isUnlocked = true
-                }
-            }
-        })
-    }
-}
 
 const handleCodeResult = (result) => {
     if (result.passed) {
