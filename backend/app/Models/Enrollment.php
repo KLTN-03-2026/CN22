@@ -9,9 +9,15 @@ class Enrollment extends Model
     protected $fillable = [
         'user_id',
         'course_id',
-        'enrolled_at',
-        'completed_at',
+        'access_type',
         'progress',
+        'enrolled_at',
+        'completed_at'
+    ];
+
+    protected $casts = [
+        'enrolled_at' => 'datetime',
+        'completed_at' => 'datetime'
     ];
 
     public function user()

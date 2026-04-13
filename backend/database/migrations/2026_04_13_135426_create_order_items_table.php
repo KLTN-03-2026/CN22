@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('order_items', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('user_id')->unsigned();
-            $table->bigInteger('course_id')->nullable();
-            $table->integer('type');
-            $table->integer('total_price')->default(0); // Số tiền thanh toán
-            $table->integer('status')->default(0); // 0: pending, 1: completed, 2: failed
+            $table->bigInteger('order_id');
+            $table->bigInteger('chapter_id');
+            $table->decimal('price', 10, 2);
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('order_items');
     }
 };

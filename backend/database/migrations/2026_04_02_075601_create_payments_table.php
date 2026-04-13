@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('order_id')->unsigned();
             $table->string('method'); // e.g., 'credit_card', 'paypal', 'bank_transfer'
-            $table->integer('transaction_code'); // Số tiền đã thanh toán
+            $table->string('transaction_code')->nullable();
             $table->integer('status')->default(0); // 0: pending, 1: completed, 2: failed
+            $table->decimal('amount', 10, 2);
+            $table->json('raw_data')->nullable(); // lưu webhook
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();
         });

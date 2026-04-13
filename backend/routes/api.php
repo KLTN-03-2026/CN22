@@ -9,6 +9,8 @@ use App\Http\Controllers\CodeController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\QuizController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -57,9 +59,9 @@ Route::prefix('/auth')->group(function () {
 Route::get('/courses', [CourseController::class, 'index']);
 
 Route::get('/lessons/{id}', [LessonController::class, 'show']);
+Route::get('/courses/{slug}', [CourseController::class, 'show']);
 Route::middleware('auth:sanctum', 'role:student')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
-    Route::get('/courses/{slug}', [CourseController::class, 'show']);
 
     Route::post('/courses/{course}/enroll', [EnrollmentController::class, 'enroll']);
     Route::get('/courses/{slug}/lessons/{id}', [LessonController::class, 'show']);
@@ -70,8 +72,17 @@ Route::middleware('auth:sanctum', 'role:student')->group(function () {
 
     Route::get('/lessons/{lesson}/coding', [CodeController::class, 'getByLesson']);
     Route::post('/code/submit', [CodeController::class, 'submit']);
+
+    // ORDER
+    Route::post('/orders', [OrderController::class, 'store']);
+    Route::get('/orders/{id}', [OrderController::class, 'show']);
+
+    // PAYMENT
+    Route::post('/payments/sepay/create', [PaymentController::class, 'create']);
 });
 
+// WEBHOOK (public)
+Route::post('/payments/sepay/webhook', [PaymentController::class, 'webhook']);
 
 // // Student routes (yêu cầu đăng nhập)
 // POST /api/courses/{id}/enroll - Đăng ký khóa học

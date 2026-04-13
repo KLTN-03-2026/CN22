@@ -27,6 +27,16 @@ class Chapter extends Model
         return $this->belongsTo(Course::class, 'course_id');
     }
 
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function userChapters()
+    {
+        return $this->hasMany(UserChapter::class);
+    }
+
 
     protected static function booted()
     {

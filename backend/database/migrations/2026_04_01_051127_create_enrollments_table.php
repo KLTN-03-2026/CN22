@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('course_id')->unsigned();
+            $table->string('access_type'); //'full', 'partial'
             $table->timestamp('enrolled_at')->useCurrent();
             $table->timestamp('completed_at')->nullable();
             $table->integer('progress')->default(0);

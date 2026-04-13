@@ -9,13 +9,22 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'course_id',
-        'chapter_id',
+        'type',
         'total_price',
-        'status',
+        'status'
     ];
+
+    const FULL_COURSE = 1;
+    const CHAPTER = 2;
 
     const STATUS_PENDING = 0;
     const STATUS_PAID = 1;
+
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONSHIPS
+    |--------------------------------------------------------------------------
+    */
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -26,8 +35,13 @@ class Order extends Model
         return $this->belongsTo(Course::class);
     }
 
-    public function chapter()
+    public function items()
     {
-        return $this->belongsTo(Chapter::class);
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
     }
 }
