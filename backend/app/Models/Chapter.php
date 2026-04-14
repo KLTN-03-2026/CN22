@@ -22,7 +22,7 @@ class Chapter extends Model
         return $this->hasMany(Lesson::class, 'chapter_id');
     }
 
-    public function courses()
+    public function course()
     {
         return $this->belongsTo(Course::class, 'course_id');
     }

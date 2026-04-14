@@ -72,6 +72,8 @@ class PaymentService
         return DB::transaction(function () use ($data) {
 
             // lưu raw để debug
+            \Log::info('SePay webhook', $data);
+
             $content = $data['content'] ?? '';
             $amount = $data['amount'] ?? 0;
             $transactionId = $data['transaction_id'] ?? null;
@@ -81,15 +83,19 @@ class PaymentService
             $orderId = $match[1] ?? null;
 
             if (!$orderId) {
-                throw new \Exception('Invalid content');
+                throw new \Exception('Nội dung không hợp lệ');
             }
 
             $order = $this->orderRepo->findById($orderId);
 
+            if (!$order) {
+                throw new \Exception('Đơn hàng không tồn tại.');
+            }
+
             $payment = $this->paymentRepo->findByOrderId($orderId);
 
             if (!$payment) {
-                throw new \Exception('Payment not found');
+                throw new \Exception('Thanh toán không tồn tại');
             }
 
             // chống duplicate
@@ -99,7 +105,7 @@ class PaymentService
 
             // check số tiền
             if ((float)$payment->amount !== (float)$amount) {
-                throw new \Exception('Amount mismatch');
+                throw new \Exception('Sai lệch về số tiền');
             }
 
             // update payment

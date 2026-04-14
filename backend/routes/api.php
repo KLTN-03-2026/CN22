@@ -58,13 +58,17 @@ Route::prefix('/auth')->group(function () {
 // GET /api/courses - Danh sách khóa học (phân trang, lọc)
 Route::get('/courses', [CourseController::class, 'index']);
 
-Route::get('/lessons/{id}', [LessonController::class, 'show']);
 Route::get('/courses/{slug}', [CourseController::class, 'show']);
 Route::middleware('auth:sanctum', 'role:student')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
 
     Route::post('/courses/{course}/enroll', [EnrollmentController::class, 'enroll']);
     Route::get('/courses/{slug}/lessons/{id}', [LessonController::class, 'show']);
+
+    Route::get('/lessons/{id}', [LessonController::class, 'show']);
+    Route::middleware(['auth:sanctum', 'lesson.access'])->group(function () {
+    Route::get('/lessons/{lessonId}', [LessonController::class, 'show']);
+});
 
     Route::get('/lessons/{lesson}/quiz', [QuizController::class, 'getByLesson']);
     Route::post('/quizzes/{quiz}/start', [QuizController::class, 'start']);
@@ -82,7 +86,7 @@ Route::middleware('auth:sanctum', 'role:student')->group(function () {
 });
 
 // WEBHOOK (public)
-Route::post('/payments/sepay/webhook', [PaymentController::class, 'webhook']);
+Route::post('/payments/sepay/webhook', [PaymentController::class, 'webhook'])->middleware('sepay.verify');
 
 // // Student routes (yêu cầu đăng nhập)
 // POST /api/courses/{id}/enroll - Đăng ký khóa học

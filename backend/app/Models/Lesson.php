@@ -16,7 +16,7 @@ class Lesson extends Model
         'score_requirement',
     ];
 
-    public function chapters()
+    public function chapter()
     {
         return $this->belongsTo(Chapter::class, 'chapter_id');
     }
