@@ -50,14 +50,14 @@ class CourseRepository
             ->keyBy('lesson_id');
     }
 
-    // Lấy danh sách chương đã mua của người dùng
     public function getPaidChapters($userId)
     {
         return DB::table('orders')
-            ->where('user_id', $userId)
-            ->whereNotNull('chapter_id')
-            ->where('status', Order::STATUS_PAID)
-            ->pluck('chapter_id')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->where('orders.user_id', $userId)
+            ->where('orders.status', Order::STATUS_PAID)
+            ->whereNotNull('order_items.chapter_id')
+            ->pluck('order_items.chapter_id')
             ->toArray();
     }
 

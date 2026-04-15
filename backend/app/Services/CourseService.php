@@ -35,7 +35,6 @@ class CourseService
             ? $this->courseRepo->enrolledCourse($course->id, $user->id)
             : false;
 
-
         $progressData = $user
             ? $this->courseRepo->getLessonProgress($user->id)
             : [];
@@ -45,13 +44,7 @@ class CourseService
             ? $this->courseRepo->getPaidChapters($user->id)
             : [];
 
-        // ===== Transform =====
-        // sắp xếp chương theo order, bài học theo order, thêm thông tin is_accessible, is_completed, progress vào từng bài học
-        // với is_accessible: nếu là chương free thì luôn true, nếu đã đăng ký khóa học thì true, nếu đã mua chương thì true, ngược lại false
-        // với is_completed: điểm của bài học >= điểm yêu cầu thì true, ngược lại false
-        // với progress: lấy từ bảng lesson_progress, nếu chưa có thì mặc định 0
-        // với unlock_condition: nếu chưa mua khóa học thì "Chưa mua khóa học", nếu chưa mua chương thì "Chưa mua chương", nếu chưa hoàn thành bài trước thì "Cần hoàn thành bài trước"
-        // lưu ý: nếu chưa đăng nhập thì chỉ hiển thị được chương free, còn lại đều bị khóa với lý do "Chưa đăng nhập"
+
         $chapters = $course->chapters
             ->sortBy('order')
             ->map(function ($chapter) use ($isEnrolled, $paidChapters, $progressData) {
@@ -89,7 +82,7 @@ class CourseService
             'title'        => $course->title,
             'description'  => $course->description,
             'price'        => $course->price,
-            'is_registered' => $isEnrolled,
+            'is_enrolled'  => $isEnrolled,
             'progress'     => $progress,
             'chapters'     => json_decode(json_encode($chapters, JSON_UNESCAPED_UNICODE), true)
         ];
@@ -100,10 +93,13 @@ class CourseService
     // Kiểm tra quyền truy cập chương
     private function checkChapterAccess($chapter, $isEnrolled, $paidChapters)
     {
-        // chương free và đã đăng ký khóa học thì có quyền truy cập
-        if ($chapter->is_free && $isEnrolled) return true;
+        // FREE → luôn được học
+        if ($chapter->is_free) return true;
 
-        // đã mua chương
+        // FULL COURSE
+        if ($isEnrolled) return true;
+
+        // MUA LẺ CHƯƠNG
         if (in_array($chapter->id, $paidChapters)) return true;
 
         return false;

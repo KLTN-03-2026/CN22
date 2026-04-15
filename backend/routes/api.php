@@ -58,10 +58,10 @@ Route::prefix('/auth')->group(function () {
 // GET /api/courses - Danh sách khóa học (phân trang, lọc)
 Route::get('/courses', [CourseController::class, 'index']);
 
-Route::get('/courses/{slug}', [CourseController::class, 'show']);
 Route::middleware('auth:sanctum', 'role:student')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
 
+    Route::get('/courses/{slug}', [CourseController::class, 'show']);
     Route::post('/courses/{course}/enroll', [EnrollmentController::class, 'enroll']);
     Route::get('/courses/{slug}/lessons/{id}', [LessonController::class, 'show']);
 

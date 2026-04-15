@@ -9,6 +9,15 @@ class VerifySePayWebhook
 {
     public function handle(Request $request, Closure $next)
     {
+        \Log::info('=== WEBHOOK HIT ===');
+        \Log::info('=== SEPAY WEBHOOK RAW ===');
+        \Log::info($request->getContent());
+
+        \Log::info('=== SEPAY WEBHOOK HEADERS ===');
+        \Log::info($request->headers->all());
+
+        \Log::info('=== SEPAY WEBHOOK PARSED ===');
+        \Log::info($request->all());
         /*
         |--------------------------------------------------------------------------
         | 1. VERIFY SIGNATURE
@@ -25,15 +34,6 @@ class VerifySePayWebhook
             if (!hash_equals($hash, $signature)) {
                 return response()->json(['error' => 'Invalid signature'], 403);
             }
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | 2. VALIDATION
-        |--------------------------------------------------------------------------
-        */
-        if (!$request->has('content') || !$request->has('amount')) {
-            return response()->json(['error' => 'Invalid payload'], 400);
         }
 
         return $next($request);

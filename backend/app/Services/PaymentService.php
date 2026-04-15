@@ -52,7 +52,7 @@ class PaymentService
         $content = "ORDER{$order->id}";
 
         // tạo QR (SePay)
-        $qr = "https://qr.sepay.vn/img?bank=MBBankacc=" . env('SEPAY_BANK_ACCOUNT')
+        $qr = "https://qr.sepay.vn/img?bank=MBBank&acc=" . env('SEPAY_BANK_ACCOUNT')
             . "&template=compact&amount={$order->total_price}&des={$content}";
 
         return [
@@ -71,12 +71,26 @@ class PaymentService
     {
         return DB::transaction(function () use ($data) {
 
+//         local.INFO: array (
+//   'gateway' => 'MBBank',
+//   'transactionDate' => '2026-04-15 09:51:00',
+//   'accountNumber' => '0867588546',
+//   'subAccount' => NULL,
+//   'code' => NULL,
+//   'content' => 'ORDER40- Ma GD ACSP/ v6522158',
+//   'transferType' => 'in',
+//   'description' => 'BankAPINotify ORDER40- Ma GD ACSP/ v6522158',
+//   'transferAmount' => 2000,
+//   'referenceCode' => 'FT26105614051413',
+//   'accumulated' => 0,
+//   'id' => 50656876,
+// )
             // lưu raw để debug
             \Log::info('SePay webhook', $data);
 
             $content = $data['content'] ?? '';
-            $amount = $data['amount'] ?? 0;
-            $transactionId = $data['transaction_id'] ?? null;
+            $amount = $data['transferAmount'] ?? 0;
+            $transactionId = $data['referenceCode'] ?? null;
 
             // parse ORDER{id}
             preg_match('/ORDER(\d+)/', $content, $match);
