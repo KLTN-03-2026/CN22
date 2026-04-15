@@ -1,34 +1,34 @@
 <template>
     <div class="min-h-screen bg-gray-50 py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4">
 
-            <!-- Back Button -->
-            <button @click="goBack" class="mb-4 text-indigo-600 hover:underline text-sm">
+            <!-- Back -->
+            <button @click="router.back()" class="mb-4 text-indigo-600 text-sm hover:underline">
                 ← Quay lại
             </button>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div v-if="isEnrolled"
+                class="mb-4 px-4 py-2 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+                Bạn đã mở khóa toàn bộ khóa học
+            </div>
+            <div class="grid lg:grid-cols-12 gap-6">
 
                 <!-- LEFT -->
                 <div class="lg:col-span-8 space-y-6">
 
-                    <!-- Course Overview -->
+                    <!-- Course Info -->
                     <div class="bg-white rounded-xl shadow p-6">
-                        <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ course.title }}</h1>
-                        <p class="text-gray-600 mb-4">
-                            {{ course.description }}
-                        </p>
-                        <div>
-                            <div class="h-3 w-full overflow-hidden rounded-full bg-gray-200">
-                                <div class="h-full bg-linear-to-r from-indigo-500 to-cyan-500 transition-all duration-500"
-                                    :style="{ width: `${course.progress}%` }"></div>
-                            </div>
-                            <p class="text-xs text-gray-500 mt-1">Hoàn thành: {{ course.progress }}</p>
+                        <h1 class="text-2xl font-bold mb-2">{{ course?.title }}</h1>
+                        <p class="text-gray-600 mb-4">{{ course?.description }}</p>
+
+                        <!-- Progress -->
+                        <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-linear-to-r from-indigo-500 to-cyan-500"
+                                :style="{ width: course?.progress + '%' }" />
                         </div>
                     </div>
 
                     <!-- Expand Controls -->
-                    <div class="flex justify-end gap-2">
+                    <div class="flex justify-end gap-2 mb-2">
                         <button @click="expandAllChapters"
                             class="px-3 py-1 text-sm bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition">
                             Mở rộng tất cả
@@ -39,12 +39,6 @@
                             Thu gọn
                         </button>
                     </div>
-
-                    <!-- Error -->
-                    <div v-if="error" class="bg-red-100 text-red-700 px-4 py-3 rounded-lg">
-                        ❌ {{ error }}
-                    </div>
-
                     <!-- Loading -->
                     <div v-if="isLoading" class="space-y-4">
                         <div v-for="i in 3" :key="i" class="bg-white p-4 rounded-xl shadow animate-pulse">
@@ -52,202 +46,189 @@
                             <div class="h-4 bg-gray-300 rounded w-2/3"></div>
                         </div>
                     </div>
-
-                    <!-- Empty -->
-                    <div v-else-if="chapters.length === 0" class="text-center py-16 text-gray-500">
-                        📭 Không có dữ liệu
-                    </div>
-
                     <!-- Chapters -->
-                    <div v-else class="space-y-4">
-                        <div v-for="chapter in chapters" :key="chapter.id"
-                            class="bg-white rounded-xl shadow transition-all duration-300 hover:shadow-lg">
+                    <div v-else>
+                        <div v-for="chapter in chapters" :key="chapter.id" class="bg-white rounded-xl shadow mb-2">
 
-                            <!-- HEADER -->
-                            <div @click="toggleChapter(chapter.id)"
-                                class="p-6 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition">
+                            <!-- Header -->
+                            <div @click="toggle(chapter.id)"
+                                class="p-5 flex justify-between cursor-pointer hover:bg-gray-50">
+
                                 <div>
-                                    <h2 class="text-lg font-semibold text-gray-800">
-                                        {{ chapter.title }}
-                                    </h2>
+                                    <h2 class="font-semibold">{{ chapter.title }}</h2>
                                     <p class="text-sm text-gray-500">{{ chapter.description }}</p>
                                 </div>
 
                                 <div class="flex items-center gap-3">
-                                    <span
-                                        :class="chapter.is_free ? 'bg-green-100 text-teal' : 'bg-indigo-100 text-indigo-600'"
-                                        class="px-3 py-1 rounded-full text-sm">
-                                        {{ chapter.is_free ? 'Miễn phí' : formatCurrency(chapter.price) }}
-                                    </span>
+                                    <span class="text-sm px-3 py-1 rounded-full" :class="chapter.is_free || isEnrolled
+                                        ? 'bg-green-100 text-green-600'
+                                        : 'bg-indigo-100 text-indigo-600'">
 
-                                    <svg :class="isOpen(chapter.id) ? 'rotate-180' : ''"
-                                        class="w-5 h-5 text-gray-500 transition-transform duration-300" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7" />
-                                    </svg>
+                                        {{
+                                            chapter.is_free
+                                                ? 'Miễn phí'
+                                                : isEnrolled
+                                                    ? 'Đã mở khóa'
+                                                    : formatCurrency(chapter.price)
+                                        }}
+                                    </span>
                                 </div>
                             </div>
 
-                            <!-- LESSONS -->
+                            <!-- Lessons -->
                             <transition enter-active-class="transition-all duration-300"
                                 leave-active-class="transition-all duration-200" enter-from-class="opacity-0 max-h-0"
                                 enter-to-class="opacity-100 max-h-[1000px]"
                                 leave-from-class="opacity-100 max-h-[1000px]" leave-to-class="opacity-0 max-h-0">
-                                <div v-if="isOpen(chapter.id)" class="px-6 pb-6 space-y-2">
+                                <div v-if="openId === chapter.id" class="px-5 pb-5 space-y-2">
 
-                                    <div v-for="(lesson, index) in chapter.lessons" :key="lesson.id"
-                                        @click.stop="navigateToDetail(lesson.id, lesson.is_unlocked)" :class="[
-                                            'relative p-3 rounded-lg border flex justify-between items-center transition-all duration-300',
-                                            lesson.is_unlocked
-                                                ? 'bg-white hover:shadow-md hover:-translate-y-1 cursor-pointer'
-                                                : 'bg-gray-100 opacity-60 cursor-not-allowed'
-                                        ]">
+                                    <div v-for="lesson in chapter.lessons" :key="lesson.id" @click="goLesson(lesson)"
+                                        class="relative p-3 rounded-lg border flex justify-between items-center transition"
+                                        :class="lesson.is_unlocked ? 'hover:shadow cursor-pointer' : 'bg-gray-100 opacity-60'">
+
                                         <div>
-                                            <p class="font-medium text-gray-800 py-2">Bài {{ index + 1 }}: {{ lesson.title
-                                                }}</p>
-                                            <p class="text-xs text-gray-500"></p>
-
+                                            <p class="font-medium">{{ lesson.title }}</p>
                                             <p v-if="!lesson.is_unlocked" class="text-xs text-red-500">
                                                 🔒 {{ lesson.unlock_condition }}
                                             </p>
                                         </div>
 
-                                        <div class="absolute bottom-2 right-4">
-                                            <button
-                                                class="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-l from-sky-500 to-indigo-500 text-white shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                                    viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                            </button>
-                                        </div>
+                                        <span v-if="lesson.is_unlocked">
+                                            <div class="absolute bottom-1 right-2">
+                                                <button
+                                                    class="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-l from-sky-500 to-indigo-500 text-white shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </span>
                                     </div>
 
                                 </div>
                             </transition>
                         </div>
                     </div>
-
                 </div>
 
                 <!-- RIGHT -->
                 <div class="lg:col-span-4">
                     <div class="bg-white rounded-xl shadow p-6 sticky top-6">
 
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Đăng ký khóa học</h3>
+                        <div v-if="!isEnrolled">
 
-                        <p class="text-sm text-gray-600 mb-4">
-                            Tham gia khóa học để mở khóa toàn bộ nội dung và theo dõi tiến độ học tập của bạn.
-                        </p>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Đăng ký khóa học</h3>
 
-                        <p class="text-2xl font-bold text-indigo-600 mb-4">{{ formatCurrency(course.price) }}</p>
+                            <p class="text-sm text-gray-600 mb-4">
+                                Tham gia khóa học để mở khóa toàn bộ nội dung và theo dõi tiến độ học tập của bạn.
+                            </p>
+                            <ul class="mt-4 text-sm text-gray-500 space-y-1">
+                                <li>✔ Truy cập trọn đời</li>
+                                <li>✔ Học mọi lúc mọi nơi</li>
+                            </ul>
 
-                        <button @click="enrollCourse"
-                            class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-all duration-300">
-                            Đăng ký ngay
-                        </button>
+                            <p class="mt-2 text-2xl font-bold text-indigo-600 mb-4 ">{{ formatCurrency(course.price) }}
+                            </p>
 
-                        <ul class="mt-4 text-sm text-gray-500 space-y-1">
-                            <li>✔ Truy cập trọn đời</li>
-                            <li>✔ Học mọi lúc mọi nơi</li>
-                        </ul>
+                            <button @click="buyFull" class="w-full bg-indigo-600 text-white py-2 rounded-lg">
+                                Mua toàn khóa
+                            </button>
+
+                            <button @click="buyChapter"
+                                class="w-full mt-2 border border-indigo-500 text-indigo-600 py-2 rounded-lg">
+                                Mua theo chương
+                            </button>
+
+                        </div>
+
+                        <div v-else>
+                            <h3 class="text-gray-800 font-semibold text-lg mb-2">Đã đăng ký khóa học</h3>
+                            <p class="text-sm text-gray-600 mb-4">
+                                Bạn đã sở hữu khóa học này. Chào mừng bạn quay trở lại!
+                            </p>
+                            <ul class="mt-4 text-sm text-gray-500 space-y-1">
+                                <li>✔ Bạn có quyền truy cập trọn đời</li>
+                                <li>✔ Tiến độ học tập của bạn đang được lưu</li>
+                            </ul>
+
+                        </div>
 
                     </div>
                 </div>
 
             </div>
         </div>
+
+        <!-- Payment Modal -->
+        <PaymentModal v-if="showPayment" :orderId="orderId" @close="showPayment = false" @paid="onPaid" />
+
     </div>
 </template>
-
 <script setup>
-import { ref, onMounted, inject } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import axios from '../../router/api.js'
+import { storeToRefs } from 'pinia'
+
+import { useCourseStore } from '../../stores/useCourseStore'
+import { useOrderStore } from '../../stores/useOrderStore'
+import { usePaymentStore } from '../../stores/usePaymentStore'
+
+import PaymentModal from '../../components/course/PaymentModal.vue'
 
 const route = useRoute()
 const router = useRouter()
-const toaster = inject('toast')
 
+const courseStore = useCourseStore()
+const orderStore = useOrderStore()
+const paymentStore = usePaymentStore()
 
-const course = ref({})
-const chapters = ref([])
-const isLoading = ref(false)
-const error = ref(null)
+const { course, isLoading } = storeToRefs(courseStore)
 
-const activeChapterId = ref(null)
-const expandAll = ref(false)
+const openId = ref(null)
+const showPayment = ref(false)
+const orderId = ref(null)
 
-const toggleChapter = (id) => {
-    if (expandAll.value) return
-    activeChapterId.value = activeChapterId.value === id ? null : id
+const chapters = computed(() => course.value?.chapters || [])
+const isEnrolled = computed(() => course.value?.is_enrolled)
+
+const toggle = (id) => {
+    openId.value = openId.value === id ? null : id
 }
 
-const isOpen = (id) => {
-    return expandAll.value || activeChapterId.value === id
+const buyFull = async () => {
+    if (!course.value?.id) return
+
+    const order = await orderStore.createFullCourse(course.value.id)
+    orderId.value = order.id
+
+    await paymentStore.createQR(orderId.value)
+
+    showPayment.value = true
 }
 
-const expandAllChapters = () => {
-    expandAll.value = true
-    activeChapterId.value = null
+const buyChapter = () => {
+    alert('Chọn chương để mua (bạn có thể làm modal riêng)')
 }
 
-const collapseAllChapters = () => {
-    expandAll.value = false
-    activeChapterId.value = null
+const goLesson = (lesson) => {
+    if (!lesson.is_unlocked) return
+    router.push(`/courses/${route.params.slug}/lessons/${lesson.id}`)
 }
 
-const loadData = async () => {
-    isLoading.value = true
-    error.value = null
-
-    try {
-        const res = await axios.get(`/courses/${route.params.slug}`)
-        course.value = res.data
-        chapters.value = res.data.chapters
-
-    } catch (e) {
-        error.value = e.response?.data?.message || 'Lỗi tải dữ liệu'
-    } finally {
-        isLoading.value = false
-    }
+const onPaid = async () => {
+    showPayment.value = false
+    await courseStore.fetchCourse(route.params.slug)
 }
 
-const enrollCourse = async () => {
-    try {
-        const res = await axios.post(`/courses/${course.value.id}/enroll`)
+onMounted(() => {
+    courseStore.fetchCourse(route.params.slug)
+})
 
-        toaster.success(res.data.message)
-
-        await loadData()
-
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-
-const navigateToDetail = (id, unlocked) => {
-    if (!unlocked) return
-    router.push(`/courses/${route.params.slug}/lessons/${id}`)
-    console.log('Go lesson', id)
-    // router.push(`/lesson/${id}`)
-}
-
-
-const goBack = () => {
-    router.back()
-}
-
-const formatCurrency = (price) => {
-    if (!price) return 'Miễn phí'
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
-}
-
-onMounted(loadData)
+const formatCurrency = (p) =>
+    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p || 0)
 </script>

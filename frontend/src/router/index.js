@@ -72,7 +72,7 @@ const routes = [
         name: 'course-detail',
         meta: { layout: 'client' },
         props: true,
-        beforeEnter: requireStudent
+        // beforeEnter: requireStudent
     },
     {
         path: '/courses/:slug/lessons/:id',
