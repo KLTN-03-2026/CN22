@@ -52,7 +52,9 @@
 
                             <!-- Header -->
                             <div @click="toggle(chapter.id)"
-                                class="p-5 flex justify-between cursor-pointer hover:bg-gray-50">
+                                class="p-5 flex justify-between cursor-pointer hover:bg-gray-50" :class="chapter.is_accessible
+                                    ? 'hover:shadow cursor-pointer'
+                                    : 'opacity-60 cursor-not-allowed'">
 
                                 <div>
                                     <h2 class="font-semibold">{{ chapter.title }}</h2>
@@ -60,14 +62,14 @@
                                 </div>
 
                                 <div class="flex items-center gap-3">
-                                    <span class="text-sm px-3 py-1 rounded-full" :class="chapter.is_free || isEnrolled
+                                    <span class="text-sm px-3 py-1 rounded-full" :class="chapter.is_accessible
                                         ? 'bg-green-100 text-green-600'
                                         : 'bg-indigo-100 text-indigo-600'">
 
                                         {{
                                             chapter.is_free
                                                 ? 'Miễn phí'
-                                                : isEnrolled
+                                                : chapter.is_accessible
                                                     ? 'Đã mở khóa'
                                                     : formatCurrency(chapter.price)
                                         }}
@@ -132,7 +134,7 @@
                                 <li>✔ Học mọi lúc mọi nơi</li>
                             </ul>
 
-                            <p class="mt-2 text-2xl font-bold text-indigo-600 mb-4 ">{{ formatCurrency(course.price) }}
+                            <p class="mt-2 text-2xl font-bold text-indigo-600 mb-4 ">Giá tiền: {{ formatCurrency(course.price) }}
                             </p>
 
                             <button @click="buyFull" class="w-full bg-indigo-600 text-white py-2 rounded-lg">
@@ -167,6 +169,10 @@
         <!-- Payment Modal -->
         <PaymentModal v-if="showPayment" :orderId="orderId" @close="showPayment = false" @paid="onPaid" />
 
+        <!-- Selected Chapter Modal  -->
+        <SelectChapterModal v-if="showSelectChapter" :chapters="chapters" @close="showSelectChapter = false"
+            @submit="handleBuyChapters" />
+
     </div>
 </template>
 <script setup>
@@ -179,6 +185,7 @@ import { useOrderStore } from '../../stores/useOrderStore'
 import { usePaymentStore } from '../../stores/usePaymentStore'
 
 import PaymentModal from '../../components/course/PaymentModal.vue'
+import SelectChapterModal from '../../components/course/SelectChapterModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -192,6 +199,7 @@ const { course, isLoading } = storeToRefs(courseStore)
 const openId = ref(null)
 const showPayment = ref(false)
 const orderId = ref(null)
+const showSelectChapter = ref(false)
 
 const chapters = computed(() => course.value?.chapters || [])
 const isEnrolled = computed(() => course.value?.is_enrolled)
@@ -212,7 +220,7 @@ const buyFull = async () => {
 }
 
 const buyChapter = () => {
-    alert('Chọn chương để mua (bạn có thể làm modal riêng)')
+    showSelectChapter.value = true
 }
 
 const goLesson = (lesson) => {
@@ -224,6 +232,30 @@ const onPaid = async () => {
     showPayment.value = false
     await courseStore.fetchCourse(route.params.slug)
 }
+
+const handleBuyChapters = async (chapterIds) => {
+    if (!chapterIds.length) return alert('Chọn ít nhất 1 chương')
+
+    const order = await orderStore.createChapterOrder(
+        course.value.id,
+        chapterIds
+    )
+
+    orderId.value = order.data.id
+
+    await paymentStore.createQR(orderId.value)
+
+    showSelectChapter.value = false
+    showPayment.value = true
+}
+
+
+
+
+
+
+
+
 
 onMounted(() => {
     courseStore.fetchCourse(route.params.slug)
