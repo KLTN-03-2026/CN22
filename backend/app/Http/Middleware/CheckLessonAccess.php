@@ -13,13 +13,24 @@ class CheckLessonAccess
     public function handle(Request $request, Closure $next)
     {
         $user = $request->user();
-        // 1. LẤY lesson
-        $lessonId = $request->route('lessonId');
+
+        $lessonId = $request->route('lesson');
+
+        // nếu không có lesson lấy từ quiz
+        if (!$lessonId && $request->route('quiz')) {
+            $quiz = \App\Models\Quiz::find($request->route('quiz'));
+            $lessonId = $quiz?->lesson_id;
+        }
 
         $lesson = Lesson::with('chapter.course')->find($lessonId);
 
         if (!$lesson) {
             return response()->json(['error' => 'Lesson not found'], 404);
+        }
+
+        // FREE
+        if ($lesson->chapter->is_free) {
+            return $next($request);
         }
 
         $courseId = $lesson->chapter->course->id;
@@ -50,9 +61,5 @@ class CheckLessonAccess
         return response()->json([
             'error' => 'Bạn chưa mua nội dung này'
         ], 403);
-
-        if ($lesson->is_free) {
-            return $next($request);
-        }
     }
 }

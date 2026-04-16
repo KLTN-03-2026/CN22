@@ -63,16 +63,15 @@ Route::middleware('auth:sanctum', 'role:student')->group(function () {
 
     Route::get('/courses/{slug}', [CourseController::class, 'show']);
     Route::post('/courses/{course}/enroll', [EnrollmentController::class, 'enroll']);
-    Route::get('/courses/{slug}/lessons/{id}', [LessonController::class, 'show']);
 
     Route::get('/lessons/{id}', [LessonController::class, 'show']);
     Route::middleware(['auth:sanctum', 'lesson.access'])->group(function () {
-    Route::get('/lessons/{lessonId}', [LessonController::class, 'show']);
-});
+        Route::get('/courses/{slug}/lessons/{lesson}', [LessonController::class, 'show']);
+        Route::get('/lessons/{lesson}/quiz', [QuizController::class, 'getByLesson']);
+        Route::post('/quizzes/{quiz}/submit', [QuizController::class, 'submit']);
+    });
 
-    Route::get('/lessons/{lesson}/quiz', [QuizController::class, 'getByLesson']);
     Route::post('/quizzes/{quiz}/start', [QuizController::class, 'start']);
-    Route::post('/quizzes/{quiz}/submit', [QuizController::class, 'submit']);
 
     Route::get('/lessons/{lesson}/coding', [CodeController::class, 'getByLesson']);
     Route::post('/code/submit', [CodeController::class, 'submit']);

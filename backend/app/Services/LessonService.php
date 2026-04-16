@@ -24,41 +24,30 @@ class LessonService
     {
         // ===== 1. Lấy lesson + course =====
         $lesson = $this->lessonRepo->findByIdWithRelations($lessonId);
-
         $course = $this->courseRepo->findWithRelations($slug);
 
-        // ===== 2. Check access =====
-        $isEnrolled = $this->courseRepo->enrolledCourse($course->id, $user->id);
-
-        if (!$isEnrolled) {
-            return [
-                'error' => 'Bạn chưa đăng ký khóa học'
-            ];
-        }
-
-        // ===== 3. Progress =====
+        // ===== 2. Progress =====
         $progressData = $this->lessonRepo->getProgress($user->id);
-
         $score = $progressData[$lesson->id]->score ?? 0;
 
         $isCompleted = $score >= $lesson->score_requirement;
 
-        // ===== 4. Check unlock =====
+        // ===== 3. Check unlock =====
         $isUnlocked = $this->checkLessonUnlock($lesson, $progressData);
 
-        // ===== 5. Lấy course structure (sidebar) =====
+        // ===== 4. Lấy course structure (sidebar) =====
         $structure = $this->lessonRepo->getCourseStructure($course->id, $progressData);
 
-        // ===== 6. Lấy exercise =====
+        // ===== 5. Lấy exercise =====
         $exercise = $this->lessonRepo->getExercise($lesson->id);
 
-        // ===== 7. Return =====
+        // ===== 6. Return =====
         return [
             'id' => $lesson->id,
             'title' => $lesson->title,
             'content' => $lesson->content,
             'videoUrl' => $lesson->video_url,
-            'isUnlocked' => true,
+            'isUnlocked' => $isUnlocked,
             'scoreRequirement' => $lesson->score_requirement,
 
             'progress' => [
@@ -70,9 +59,9 @@ class LessonService
             'courseStructure' => $structure
         ];
     }
+    
     private function checkLessonUnlock($lesson, $progressData)
     {
-        return true;
         // ===== 1. Lấy bài trước trong cùng chapter =====
         $prevLesson = $this->lessonRepo->getPreviousLesson($lesson);
 

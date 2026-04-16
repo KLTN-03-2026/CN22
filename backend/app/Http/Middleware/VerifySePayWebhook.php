@@ -18,11 +18,9 @@ class VerifySePayWebhook
 
         \Log::info('=== SEPAY WEBHOOK PARSED ===');
         \Log::info($request->all());
-        /*
-        |--------------------------------------------------------------------------
-        | 1. VERIFY SIGNATURE
-        |--------------------------------------------------------------------------
-        */
+
+        // 1. VERIFY SIGNATURE
+        
         $signature = $request->header('X-SEPAY-SIGNATURE');
 
         if ($signature) {

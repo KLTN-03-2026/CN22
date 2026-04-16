@@ -24,9 +24,9 @@ class QuizRepository
 
     public function createQuizResult($data)
     {
-        return DB::table('quiz_results')->insertGetId($data)
-            ? DB::table('quiz_results')->latest('id')->first()
-            : null;
+        $id = DB::table('quiz_results')->insertGetId($data);
+
+        return DB::table('quiz_results')->where('id', $id)->first();
     }
 
     public function updateQuizResult($id, $data)

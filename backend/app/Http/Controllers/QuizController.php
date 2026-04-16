@@ -23,12 +23,12 @@ class QuizController extends Controller
     }
 
     // ===== START QUIZ =====
-    public function start($quizId, Request $request)
-    {
-        return response()->json(
-            $this->quizService->startQuiz($quizId, $request->user())
-        );
-    }
+    // public function start($quizId, Request $request)
+    // {
+    //     return response()->json(
+    //         $this->quizService->startQuiz($quizId, $request->user())
+    //     );
+    // }
 
     // ===== SUBMIT QUIZ =====
     public function submit($quizId, Request $request)

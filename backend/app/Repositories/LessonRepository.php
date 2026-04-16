@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories;
 
 use App\Models\Chapter;
@@ -10,7 +11,7 @@ class LessonRepository
 {
     public function findByIdWithRelations($id)
     {
-        return Lesson::with(['chapters.courses'])->findOrFail($id);
+        return Lesson::with(['chapter.course'])->findOrFail($id);
     }
 
     public function getProgress($userId)
@@ -47,9 +48,8 @@ class LessonRepository
                     return [
                         'id' => $lesson->id,
                         'title' => $lesson->title,
-                        'isUnlocked' => true, // đổi nếu có logic mở khóa sau
-                        'scoreRequirement' => 70,
-                        'completed' => $score >= $lesson->score_requirement
+                        'scoreRequirement' => $lesson->score_requirement,
+                        'score' => $score
                     ];
                 })
             ];

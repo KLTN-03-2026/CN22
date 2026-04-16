@@ -16,7 +16,7 @@ class LessonController extends Controller
         $this->lessonService = $lessonService;
     }
 
-    // Lấy chi tiết bài học, kiểm tra quyền truy cập và trạng thái mở khóa
+    // Lấy chi tiết bài học
     public function show($slug, $id, Request $request)
     {
         return response()->json(
@@ -33,5 +33,5 @@ class LessonController extends Controller
         ]);
     }
 
-    
+
 }
