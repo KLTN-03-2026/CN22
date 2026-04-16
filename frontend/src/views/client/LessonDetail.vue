@@ -13,7 +13,7 @@
             </div>
 
             <!-- Loading -->
-            <div v-if="isLoading" class="space-y-4">
+            <div v-if="loading" class="space-y-4">
                 <div class="bg-white p-6 rounded-xl shadow animate-pulse">
                     <div class="h-6 bg-gray-300 w-1/3 mb-4"></div>
                     <div class="h-40 bg-gray-300 mb-4"></div>
@@ -84,15 +84,18 @@
                             <h3 class="text-lg font-semibold text-gray-800 mb-4">Bài tập</h3>
 
                             <!-- QUIZ COMPONENT -->
-                            <ExerciseQuiz/>
+                            <ExerciseQuiz v-if="lesson.exercise?.type === 'quiz'" :data="lesson.exercise"
+                                @submitted="handleResult" />
 
                             <!-- CODE COMPONENT -->
-                            <!-- <ExerciseCode v-if="lesson.exercise?.type === 'code'" @submitted="handleCodeResult" /> -->
+                            <ExerciseCode v-if="lesson.exercise?.type === 'code'" :data="lesson.exercise"
+                                @submitted="handleResult" />
+
 
                             <!-- Kết quả -->
                             <div v-if="exerciseResult" class="mt-6 p-4 bg-gray-50 rounded-lg text-sm">
                                 <p class="font-medium">Kết quả: <span class="font-bold">{{ exerciseResult.score
-                                        }}%</span></p>
+                                }}%</span></p>
                                 <p :class="exerciseResult.passed ? 'text-green-600' : 'text-red-600'">
                                     {{ exerciseResult.passed ? '✅ Đạt yêu cầu' : '❌ Chưa đạt' }}
                                 </p>
@@ -108,53 +111,43 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import axios from '../../router/api.js'
-import ExerciseQuiz from './ExerciseQuiz.vue'
-import { useQuizStore } from '../../stores/useQuizStore'
+import { storeToRefs } from 'pinia'
+import { useLessonStore } from '../../stores/useLessonStore'
 
-const quizStore = useQuizStore()
+import ExerciseQuiz from './ExerciseQuiz.vue'
+
 const route = useRoute()
 const router = useRouter()
 
-const lesson = ref({})
-const isLoading = ref(false)
-const error = ref(null)
+const lessonStore = useLessonStore()
+const { lesson, loading, error } = storeToRefs(lessonStore)
+
 const exerciseResult = ref(null)
 const isSidebarOpen = ref(true)
 
-const loadLesson = async () => {
-    isLoading.value = true
-    error.value = null
-
-    try {
-        const { slug, id } = route.params
-
-        const res = await axios.get(`/courses/${slug}/lessons/${id}`)
-
-        lesson.value = res.data
-    } catch (e) {
-        error.value = 'Không thể tải bài học'
-    } finally {
-        isLoading.value = false
-    }
-}
-
-
-const handleCodeResult = (result) => {
-    if (result.passed) {
-        unlockNextLesson()
-    }
-}
 
 const goBack = () => router.back()
 
-const navigateToLesson = (item) => {
-    if (!item.isUnlocked) return
-    router.push(`/courses/${route.params.slug}/lessons/${item.id}`)
-    loadLesson()
+const handleResult = async (result) => {
+    exerciseResult.value = result
+
+    if (result.is_passed) {
+        await lessonStore.refresh() // 🔥 chuẩn
+    }
 }
 
-onMounted(loadLesson)
+watch(
+    () => route.params.id,
+    async (newId) => {
+        exerciseResult.value = null
+        await lessonStore.fetchLesson(route.params.slug, newId)
+    }
+)
+
+
+onMounted(() => {
+    lessonStore.fetchLesson(route.params.slug, route.params.id)
+})
 </script>

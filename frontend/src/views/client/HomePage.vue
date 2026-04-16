@@ -2,7 +2,7 @@
     <div class="min-h-screen bg-gray-50">
         <!-- Hero Section -->
         <section
-            class="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-blue-600 to-teal-500 py-20 px-4 md:py-32">
+            class="relative overflow-hidden bg-linear-to-br from-indigo-600 via-blue-600 to-teal-500 py-20 px-4 md:py-32">
             <div class="absolute inset-0 bg-black opacity-10"></div>
             <div class="relative mx-auto max-w-6xl text-center">
                 <h1 class="mb-6 text-4xl font-bold text-white md:text-5xl lg:text-6xl">
@@ -71,7 +71,7 @@
 
 
         <!-- CTA Section -->
-        <section class="bg-gradient-to-r from-indigo-600 to-teal-500 py-16 px-4">
+        <section class="bg-linear-to-r from-indigo-600 to-teal-500 py-16 px-4">
             <div class="mx-auto max-w-4xl text-center">
                 <h2 class="mb-6 text-3xl font-bold text-white md:text-4xl">
                     Bắt đầu hành trình học ngay hôm nay

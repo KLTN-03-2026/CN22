@@ -2,7 +2,7 @@
     <div class="min-h-screen bg-white">
         <!-- Hero Section -->
         <section
-            class="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-blue-600 to-cyan-500 py-20 px-4 md:py-32">
+            class="relative overflow-hidden bg-linear-to-br from-indigo-600 via-blue-600 to-cyan-500 py-20 px-4 md:py-32">
             <div class="absolute inset-0 bg-black opacity-10"></div>
             <div class="relative mx-auto max-w-6xl text-center">
                 <h1 class="mb-6 text-4xl font-bold text-white md:text-5xl lg:text-6xl">
@@ -64,11 +64,11 @@
                     </div>
                     <div class="relative">
                         <div
-                            class="aspect-w-16 aspect-h-9 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100 p-8 shadow-lg">
+                            class="aspect-w-16 aspect-h-9 rounded-2xl bg-linear-to-br from-blue-50 to-indigo-100 p-8 shadow-lg">
                             <div class="flex h-full items-center justify-center">
                                 <div class="text-center">
                                     <div
-                                        class="mx-auto mb-4 h-24 w-24 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 p-1">
+                                        class="mx-auto mb-4 h-24 w-24 rounded-full bg-linear-to-br from-blue-500 to-indigo-600 p-1">
                                         <div
                                             class="flex h-full w-full items-center justify-center rounded-full bg-white">
                                             <svg class="h-12 w-12 text-blue-600" xmlns="http://www.w3.org/2000/svg"
@@ -104,7 +104,7 @@
                     <!-- Feature 1 -->
                     <div class="group rounded-xl bg-white p-8 shadow-sm transition-all duration-300 hover:shadow-lg">
                         <div
-                            class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
+                            class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-indigo-600 text-white">
                             <svg class="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -125,7 +125,7 @@
                     <!-- Feature 2 -->
                     <div class="group rounded-xl bg-white p-8 shadow-sm transition-all duration-300 hover:shadow-lg">
                         <div
-                            class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-teal-600 text-white">
+                            class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-linear-to-br from-cyan-500 to-teal-600 text-white">
                             <svg class="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -146,7 +146,7 @@
                     <!-- Feature 3 -->
                     <div class="group rounded-xl bg-white p-8 shadow-sm transition-all duration-300 hover:shadow-lg">
                         <div
-                            class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 text-white">
+                            class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-linear-to-br from-purple-500 to-pink-600 text-white">
                             <svg class="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -166,7 +166,7 @@
                     <!-- Feature 4 -->
                     <div class="group rounded-xl bg-white p-8 shadow-sm transition-all duration-300 hover:shadow-lg">
                         <div
-                            class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white">
+                            class="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-linear-to-br from-amber-500 to-orange-600 text-white">
                             <svg class="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -282,7 +282,7 @@
                 <div class="grid gap-8 md:grid-cols-2">
                     <div class="rounded-xl bg-white p-8 shadow-sm">
                         <div
-                            class="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white mx-auto">
+                            class="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-indigo-600 text-white mx-auto">
                             <svg class="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -300,7 +300,7 @@
 
                     <div class="rounded-xl bg-white p-8 shadow-sm">
                         <div
-                            class="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-teal-600 text-white mx-auto">
+                            class="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-linear-to-br from-cyan-500 to-teal-600 text-white mx-auto">
                             <svg class="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -318,7 +318,7 @@
         </section>
 
         <!-- Call To Action -->
-        <section class="bg-gradient-to-r from-indigo-600 to-cyan-500 py-16 px-4 md:py-20">
+        <section class="bg-linear-to-r from-indigo-600 to-cyan-500 py-16 px-4 md:py-20">
             <div class="mx-auto max-w-4xl text-center">
                 <h2 class="mb-6 text-3xl font-bold text-white md:text-4xl">
                     Bắt đầu hành trình học lập trình thông minh ngay hôm nay

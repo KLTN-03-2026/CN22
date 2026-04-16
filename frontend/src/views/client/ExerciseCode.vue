@@ -1,7 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useQuizStore } from '../../stores/useQuizStore'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
+
+onMounted(async () => {
+  await store.fetchQuestion(route.params.id)
+})
 const store = useQuizStore()
 
 const editorRef = ref(null)
@@ -9,11 +15,6 @@ let editor
 
 const code = ref('function sum(a, b) { return a + b }')
 
-onMounted(async () => {
-  await store.fetchQuestion(1) // lesson_id
-
-  // init editor (giữ nguyên)
-})
 
 onMounted(() => {
     editor = new EditorView({

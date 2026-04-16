@@ -1,26 +1,28 @@
 <script setup>
 import { onMounted, computed } from 'vue'
 import { useQuizStore } from '../../stores/useQuizStore'
-import { useRoute} from 'vue-router'
+import { useRoute } from 'vue-router'
 
 const quizStore = useQuizStore()
 const route = useRoute()
 
 const isComplete = computed(() => {
-  if (!quizStore.quiz) return false
-  return quizStore.quiz.questions.every(
-    q => quizStore.answers[q.id]
-  )
+    if (!quizStore.quiz) return false
+    return quizStore.quiz.questions.every(
+        q => quizStore.answers[q.id]
+    )
 })
+const emit = defineEmits(['submitted'])
+
+const submitQuiz = async () => {
+    const result = await quizStore.submitQuiz()
+
+    emit('submitted', result) // 🔥 QUAN TRỌNG
+}
 
 onMounted(() => {
-    // truyền lessonId từ route hoặc parent
     quizStore.fetchQuiz(route.params.id)
 })
-
-const submitQuiz = () => {
-    quizStore.submitQuiz()
-}
 </script>
 
 <template>

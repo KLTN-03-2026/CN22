@@ -1,18 +1,22 @@
+// stores/useQuizStore.js
 import { defineStore } from 'pinia'
-import api from '../router/api'
+import axios from '../router/api'
 
 export const useQuizStore = defineStore('quiz', {
     state: () => ({
         quiz: null,
         answers: {},
-        testCases: [],
         result: null,
         loading: false,
     }),
 
     actions: {
         async fetchQuiz(lessonId) {
-            const res = await api.get(`/lessons/${lessonId}/quiz`)
+            this.quiz = null
+            this.answers = {}
+            this.result = null
+
+            const res = await axios.get(`/lessons/${lessonId}/quiz`)
             this.quiz = res.data
         },
 
@@ -23,7 +27,6 @@ export const useQuizStore = defineStore('quiz', {
         async submitQuiz() {
             this.loading = true
 
-
             try {
                 const payload = {
                     answers: Object.keys(this.answers).map(qId => ({
@@ -32,39 +35,16 @@ export const useQuizStore = defineStore('quiz', {
                     }))
                 }
 
-                const res = await api.post(
+                const res = await axios.post(
                     `/quizzes/${this.quiz.id}/submit`,
                     payload
                 )
 
-                this.result = res.data
-
-            } finally {
-                this.loading = false
-            }
-        },
+                this.result = res.data.is_passed
 
 
-        async fetchQuestion(lessonId) {
-            const res = await api.get(`/lessons/${lessonId}/coding`)
-            this.question = res.data.question
-            this.testCases = res.data.testcases
-        },
+                return res.data 
 
-        async submitCode(code) {
-            this.loading = true
-
-            try {
-                const res = await api.post(`/code/submit`, {
-                    question_id: this.question.id,
-                    code
-                })
-
-                this.result = res.data
-                this.testCases = res.data.testcases
-
-            } catch (e) {
-                alert('Lỗi submit')
             } finally {
                 this.loading = false
             }
