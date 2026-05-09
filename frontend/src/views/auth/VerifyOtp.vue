@@ -75,7 +75,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
-import axios from '../../router/api.js';
+import axios from '../../api/axios.js';
 import { inject } from 'vue'
 import { useRouter } from 'vue-router';
 

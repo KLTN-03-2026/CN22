@@ -8,16 +8,22 @@ const route = useRoute()
 
 const isComplete = computed(() => {
     if (!quizStore.quiz) return false
+
     return quizStore.quiz.questions.every(
         q => quizStore.answers[q.id]
     )
 })
+
 const emit = defineEmits(['submitted'])
 
 const submitQuiz = async () => {
-    const result = await quizStore.submitQuiz()
+    try {
+        const result = await quizStore.submitQuiz()
+        
+        emit('submitted', result)
+    } catch (error) {
+    }
 
-    emit('submitted', result) // 🔥 QUAN TRỌNG
 }
 
 onMounted(() => {
@@ -49,7 +55,7 @@ onMounted(() => {
 
         <!-- Submit -->
         <button @click="submitQuiz" :disabled="!isComplete || quizStore.loading"
-            class="w-full bg-indigo-600 text-white py-2 rounded-lg">
+            class="w-full bg-indigo-600 text-white py-2 rounded-lg disabled:opacity-50">
 
             {{ quizStore.loading ? 'Đang chấm...' : 'Nộp bài' }}
         </button>

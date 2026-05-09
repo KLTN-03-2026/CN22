@@ -1,4 +1,4 @@
-import api from '../router/api.js'
+import api from '../api/axios.js'
 
 export const getProfileAPI = () => {
   return api.get('/profile')

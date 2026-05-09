@@ -86,20 +86,11 @@
                             <!-- QUIZ COMPONENT -->
                             <ExerciseQuiz v-if="lesson.exercise?.type === 'quiz'" :data="lesson.exercise"
                                 @submitted="handleResult" />
-
+                            <ExerciseQuiz v-if="lesson.id" :lesson-id="lesson.id" @submitted="handleResult" />
                             <!-- CODE COMPONENT -->
                             <ExerciseCode v-if="lesson.exercise?.type === 'code'" :data="lesson.exercise"
                                 @submitted="handleResult" />
 
-
-                            <!-- Kết quả -->
-                            <div v-if="exerciseResult" class="mt-6 p-4 bg-gray-50 rounded-lg text-sm">
-                                <p class="font-medium">Kết quả: <span class="font-bold">{{ exerciseResult.score
-                                }}%</span></p>
-                                <p :class="exerciseResult.passed ? 'text-green-600' : 'text-red-600'">
-                                    {{ exerciseResult.passed ? '✅ Đạt yêu cầu' : '❌ Chưa đạt' }}
-                                </p>
-                            </div>
                         </div>
                     </div>
 
@@ -111,7 +102,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useLessonStore } from '../../stores/useLessonStore'
@@ -124,30 +115,20 @@ const router = useRouter()
 const lessonStore = useLessonStore()
 const { lesson, loading, error } = storeToRefs(lessonStore)
 
-const exerciseResult = ref(null)
 const isSidebarOpen = ref(true)
 
 
 const goBack = () => router.back()
 
 const handleResult = async (result) => {
-    exerciseResult.value = result
-
     if (result.is_passed) {
-        await lessonStore.refresh() // 🔥 chuẩn
+        await lessonStore.refresh()
     }
 }
 
-watch(
-    () => route.params.id,
-    async (newId) => {
-        exerciseResult.value = null
-        await lessonStore.fetchLesson(route.params.slug, newId)
-    }
-)
+watch(() => route.params.id, async (newId) => {
+    if (!newId) return
+    await lessonStore.fetchLesson(route.params.slug, newId)
+}, { immediate: true })
 
-
-onMounted(() => {
-    lessonStore.fetchLesson(route.params.slug, route.params.id)
-})
 </script>

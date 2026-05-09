@@ -12,9 +12,7 @@ export const useQuizStore = defineStore('quiz', {
 
     actions: {
         async fetchQuiz(lessonId) {
-            this.quiz = null
-            this.answers = {}
-            this.result = null
+            this.reset()
 
             const res = await axios.get(`/lessons/${lessonId}/quiz`)
             this.quiz = res.data
@@ -40,14 +38,25 @@ export const useQuizStore = defineStore('quiz', {
                     payload
                 )
 
-                this.result = res.data.is_passed
+                this.result = res.data
 
 
                 return res.data 
 
-            } finally {
+            } catch (e) {
+                console.error(e)
+                throw e
+            } 
+            finally {
                 this.loading = false
             }
+        },
+
+        reset() {
+            this.quiz = null
+            this.answers = {}
+            this.result = null
+            this.loading = false
         }
     }
 })

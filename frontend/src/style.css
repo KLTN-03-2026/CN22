@@ -1,4 +1,22 @@
+/* styles.css  */
 @import "tailwindcss";
-@import "flowbite/src/themes/default";
 @plugin "flowbite/plugin";
 @source "../node_modules/flowbite";
+
+@import "flowbite/src/themes/default";
+
+/* MINIMAL THEME */
+/* @import "flowbite/src/themes/minimal"; */
+
+
+/* ENTERPRISE THEME
+@import "flowbite/src/themes/enterprise";
+
+
+/* PLAYFUL THEME
+@import "flowbite/src/themes/playful";
+*/
+
+/* MONO THEME
+@import "flowbite/src/themes/mono";
+*/
