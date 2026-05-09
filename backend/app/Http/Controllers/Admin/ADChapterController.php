@@ -1,37 +1,76 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\ChapterService;
+use App\Http\Requests\Admin\ChapterRequest;
+use App\Models\Chapter;
+use App\Models\Course;
 use Illuminate\Http\Request;
 
 class ADChapterController extends Controller
 {
-    protected $chapterService;
-
-    public function __construct(ChapterService $chapterService)
+    // GET /admin/courses/{course}/chapters
+    public function index(Course $course)
     {
-        $this->chapterService = $chapterService;
+        $chapters = $course->chapters()->orderBy('order')->get();
+        return response()->json($chapters);
     }
 
-    public function index(Request $request)
+    // POST /admin/courses/{course}/chapters
+    public function store(ChapterRequest $request, Course $course)
     {
-        return $this->chapterService->getByCourse($request->course_id);
+        $data = $request->all();
+
+        $data['course_id'] = $course->id;
+        $data['order'] = $data['order'] ?? ($course->chapters()->count() + 1);
+
+        $chapter = Chapter::create($data);
+
+        return response()->json($chapter, 201);
     }
 
-    public function store(Request $request)
+    // PUT /admin/chapters/{chapter}
+    public function update(ChapterRequest $request, Chapter $chapter)
     {
-        return $this->chapterService->create($request->all());
+        $data = $request->all();
+
+        if (isset($data['order'])) {
+            // Cập nhật lại order các chapter khác nếu cần
+            if ($data['order'] !== $chapter->order) {
+                $course = $chapter->course;
+                $chapters = $course->chapters()->orderBy('order')->get();
+
+                foreach ($chapters as $c) {
+                    if ($c->id === $chapter->id) continue;
+
+                    if ($c->order >= $data['order'] && $c->order < $chapter->order) {
+                        $c->increment('order');
+                    } elseif ($c->order <= $data['order'] && $c->order > $chapter->order) {
+                        $c->decrement('order');
+                    }
+                }
+            }
+        }
+
+        $chapter->update($data);
+
+        return response()->json($chapter);
     }
 
-    public function update(Request $request, $id)
+    // DELETE /admin/chapters/{chapter}
+    public function destroy(Chapter $chapter)
     {
-        return $this->chapterService->update($id, $request->all());
-    }
+        $chapter->delete();
 
-    public function destroy($id)
-    {
-        return $this->chapterService->delete($id);
+        // Cập nhật lại order các chapter còn lại
+        $course = $chapter->course;
+        $chapters = $course->chapters()->orderBy('order')->get();
+
+        foreach ($chapters as $index => $c) {
+            $c->update(['order' => $index + 1]);
+        }
+
+        return response()->json(null, 204);
     }
 }

@@ -26,7 +26,7 @@ class CourseService
     {
         return $this->courseRepo->getAll();
     }
-
+    
     public function getCourseDetail($slug, $user)
     {
         $course = $this->courseRepo->findWithRelations($slug);
@@ -62,14 +62,14 @@ class CourseService
                 );
 
                 return [
-                    'id' => $chapter->id,
-                    'title' => $chapter->title,
-                    'order' => $chapter->order,
-                    'description' => $chapter->description,
-                    'is_free' => $chapter->is_free,
-                    'price' => $chapter->price,
+                    'id'            => $chapter->id,
+                    'title'         => $chapter->title,
+                    'order'         => $chapter->order,
+                    'description'   => $chapter->description,
+                    'is_free'       => $chapter->is_free,
+                    'price'         => $chapter->price,
                     'is_accessible' => $hasAccess,
-                    'lessons' => $lessons
+                    'lessons'       => $lessons
                 ];
             });
 
@@ -80,6 +80,7 @@ class CourseService
         $courseData = [
             'id'           => $course->id,
             'title'        => $course->title,
+            'slug'         => $course->slug,
             'description'  => $course->description,
             'price'        => $course->price,
             'is_enrolled'  => $isEnrolled,
@@ -189,40 +190,5 @@ class CourseService
     {
         return 70; // note: giả lập điểm để test, sau này sẽ lấy từ $progressData
         return $progressData[$lessonId]->score ?? 0;
-    }
-
-
-
-
-
-    //=========================================================================================
-    //=========================================================================================
-    //============================== ADMIN ====================================================
-    //=========================================================================================
-    //=========================================================================================
-
-    public function getAllCourses()
-    {
-        return $this->courseRepo->getAll();
-    }
-
-    public function createCourse($data)
-    {
-        return $this->courseRepo->create($data);
-    }
-
-    public function getCourseById($id)
-    {
-        return $this->courseRepo->find($id);
-    }
-
-    public function updateCourse($id, $data)
-    {
-        return $this->courseRepo->update($id, $data);
-    }
-
-    public function deleteCourse($id)
-    {
-        return $this->courseRepo->delete($id);
     }
 }

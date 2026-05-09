@@ -56,4 +56,11 @@ class AuthController extends Controller
             $this->authService->me($request->user())
         );
     }
+
+    public function forgotPassword(Request $request)
+    {
+        return response()->json([
+           $this->authService->forgotPassword($request->all())
+        ]);
+    }
 }

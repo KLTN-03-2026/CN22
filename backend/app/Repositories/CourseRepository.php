@@ -8,14 +8,6 @@ use Illuminate\Support\Facades\DB;
 
 class CourseRepository
 {
-    // Tìm khóa học theo ID
-    public function findById($id)
-    {
-        return DB::table('courses')
-            ->where('id', $id)
-            ->first();
-    }
-
     // Lấy tất cả khóa học (có thể thêm phân trang, lọc sau)
     public function getAll()
     {
@@ -23,6 +15,14 @@ class CourseRepository
             ->where('status', Course::ACTIVE)
             ->get();
         return $data;
+    }
+
+    // Tìm khóa học theo ID
+    public function findById($id)
+    {
+        return DB::table('courses')
+            ->where('id', $id)
+            ->first();
     }
 
     // Lấy chi tiết khóa học kèm theo chương và bài học
@@ -59,28 +59,5 @@ class CourseRepository
             ->whereNotNull('order_items.chapter_id')
             ->pluck('order_items.chapter_id')
             ->toArray();
-    }
-
-
-    public function create($data)
-    {
-        return Course::create($data);
-    }
-
-    public function find($id)
-    {
-        return Course::findOrFail($id);
-    }
-
-    public function update($id, $data)
-    {
-        $course = $this->find($id);
-        $course->update($data);
-        return $course;
-    }
-
-    public function delete($id)
-    {
-        return Course::destroy($id);
     }
 }

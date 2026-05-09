@@ -98,19 +98,27 @@ class AuthService
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        $user = [
+            'id'        => $user->id,
+            'name'      => $user->name,
+            'email'     => $user->email,
+            'role'      => $user->role->name,
+        ];
+
         return [
-            'user' => $user,
-            'token' => $token
+            'user'          => $user,
+            'accessToken'   => $token
         ];
     }
 
     public function me($user)
     {
         return [
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'role' => $user->role->name
+            'id'        => $user->id,
+            'name'      => $user->name,
+            'email'     => $user->email,
+            'role'      => $user->role->name,
+            'is_active' => $user->is_active
         ];
     }
 
@@ -120,7 +128,16 @@ class AuthService
         $user->tokens()->delete();
 
         return [
+            'status'  => true,
             'message' => 'Đăng xuất thành công.'
         ];
+    }
+
+    public function forgotPassword($data) {
+//         Nhận email
+// Check email tồn tại
+// Generate token random
+// Lưu token vào DB
+// Gửi mail:
     }
 }
